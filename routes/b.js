@@ -4,7 +4,6 @@ const pool = require('../public/javascripts/database.js')
 const multer  = require('multer')
 const board = 'b';
 const bcrypt = require('bcrypt');
-var io = null;
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -41,19 +40,10 @@ router.get('/arhiva', function(req, res, next) {
   res.render('archive', { title: '/b/ - Općenito - Arhiva - Jugochan' });
 });
 
+
+
 router.get('/thread/:id', function(req, res, next) {
-
-  if(!io){
-      io = require('socket.io')(req.connection.server);
-      io.on("connection", function(client) {
-      console.log("Konekcija napravljena: " + client.id)
-        client.emit('poruke', 'Proba test')
-        client.on('disconnect', function() {
-        console.log('disconnected event');
-      })
-    })
-  }
-
+  //res.cookie('myCookie', 'cookie-value');
   pool.connect(async (err,client,done) => {
     if(err)
       return res.send(err);
@@ -162,13 +152,10 @@ router.post('/reply', upload.single('uploaded_file'), function(req, res, next){
           client.query(`SELECT last_value FROM thread_number`, [], async(err, result) => {
             if(err)
               return res.send(err);
-            client.query(`INSERT INTO replies(username, tripcode, text, post_id) VALUES($1,$2,$3,$4);`, [username, hash.substring(0, 10), req.body.text, req.body.thread_id], async(err) => {
+            client.query(`INSERT INTO replies(username, tripcode, text, post_id, cookie) VALUES($1,$2,$3,$4,$5);`, [username, hash.substring(0, 10), req.body.text, req.body.thread_id, req.cookies.session_id], async(err) => {
               done()
               if(err)
                 return res.send(err);
-
-
-
               return res.redirect('/b/thread/' + req.body.thread_id);
             })
           })
@@ -182,7 +169,7 @@ router.post('/reply', upload.single('uploaded_file'), function(req, res, next){
         client.query(`SELECT last_value FROM thread_number`, [], async(err, result) => {
           if(err)
             return res.send(err);
-          client.query(`INSERT INTO replies(username, text, post_id) VALUES($1,$2,$3);`, [req.body.username, req.body.text, req.body.thread_id], async(err) => {
+          client.query(`INSERT INTO replies(username, text, post_id, cookie) VALUES($1,$2,$3,$4);`, [req.body.username, req.body.text, req.body.thread_id, req.cookies.session_id], async(err) => {
             done()
             if(err)
               return res.send(err);
@@ -205,7 +192,7 @@ router.post('/reply', upload.single('uploaded_file'), function(req, res, next){
           client.query(`SELECT last_value FROM thread_number`, [], async(err, result) => {
             if(err)
               return res.send(err);
-            client.query(`INSERT INTO replies(username, tripcode, text, image_link, post_id) VALUES($1,$2,$3,$4,$5);`, [username, hash.substring(0, 10), req.body.text, req.file.filename, req.body.thread_id], async(err) => {
+            client.query(`INSERT INTO replies(username, tripcode, text, image_link, post_id, cookie) VALUES($1,$2,$3,$4,$5,$6);`, [username, hash.substring(0, 10), req.body.text, req.file.filename, req.body.thread_id, req.cookies.session_id], async(err) => {
               done()
               if(err)
                 return res.send(err);
@@ -222,7 +209,7 @@ router.post('/reply', upload.single('uploaded_file'), function(req, res, next){
         client.query(`SELECT last_value FROM thread_number`, [], async(err, result) => {
           if(err)
             return res.send(err);
-          client.query(`INSERT INTO replies(username, text, image_link, post_id) VALUES($1,$2,$3,$4);`, [req.body.username, req.body.text, req.file.filename, req.body.thread_id], async(err) => {
+          client.query(`INSERT INTO replies(username, text, image_link, post_id, cookie) VALUES($1,$2,$3,$4,$5);`, [req.body.username, req.body.text, req.file.filename, req.body.thread_id, req.cookie.session_id], async(err) => {
             done()
             if(err)
               return res.send(err);
@@ -232,6 +219,17 @@ router.post('/reply', upload.single('uploaded_file'), function(req, res, next){
       })
     }
   }
+});
+
+router.delete('/delete', function (req, res) {
+  const ids = req.body.ids.split(',');
+  pool.connect(async (err,client,done) => {
+    if (err) return res.send(err);
+    client.query(`DELETE FROM replies WHERE replies.id = ANY ($1) AND replies.cookie = $2`, [ids, req.body.cookie], async(err) => {
+      done()
+      if (err) return res.send(err)
+      return res.send({});})
+  })
 });
 
 module.exports = router;

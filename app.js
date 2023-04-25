@@ -4,6 +4,7 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var favicon = require('serve-favicon');
+const bcrypt = require('bcrypt');
 
 // var postRouter = require('./routes/post');
 
@@ -22,14 +23,29 @@ var app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
+app.use(cookieParser('mojasifra'));
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(favicon(__dirname + '/public/images/jugochan.ico'));
 
 //app.use('/post', postRouter);
+
+app.use(function (req, res, next){
+    if(Object.keys(req.cookies).length === 0){
+      let unix_time = toString(Date.now());
+      bcrypt.hash(unix_time, 5, function (err, hash) {
+        if (err) next(err)
+        else {
+          res.cookie('session_id', hash)
+          next()
+        }
+    })
+  }
+    else
+      next()
+})
 
 app.use('/b', bRouter);
 app.use('/his', hisRouter);

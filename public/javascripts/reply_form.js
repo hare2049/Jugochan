@@ -13,7 +13,6 @@ document.getElementById("reply_link").addEventListener("click", function(e) {
 
 let x = document.getElementById('draggable_header_x');
 x.addEventListener('click', () => {
-    console.log('testiranje')
     floatingForm.style.display = 'none';
     open = false;
 })
@@ -42,15 +41,16 @@ document.addEventListener('mouseup', () => {
 
 
 let open = false;
-let floatingReply = document.getElementById('floating_reply');
-floatingReply.addEventListener('click', ()=> {
+let floatingReplyBottom = document.getElementById('floating_reply_bottom');
+floatingReplyBottom.addEventListener('click', ()=> {
     if(open === false){
-        floatingForm.style.display = 'flex'
-        open = true
-    }
-    else{
-        floatingForm.style.display = 'flex'
-        open = false
+        let centerX = window.innerWidth / 2 - floatingForm.offsetWidth / 2;
+        let centerY = window.innerHeight / 2 - floatingForm.offsetHeight / 2;
+        floatingForm.style.left = centerX + 'px';
+        floatingForm.style.top = centerY + 'px';
+        floatingText.value = '';
+        floatingForm.style.display = 'flex';
+        open = true;
     }
 })
 
@@ -58,10 +58,16 @@ floatingReply.addEventListener('click', ()=> {
 function formPopUp(id){
     if(open === false){
         let rect = id.getBoundingClientRect();
-        floatingForm.style.left = rect.left + window.scrollX + "px";
-        floatingForm.style.top = rect.top + window.scrollY + "px";
+        floatingForm.style.left = rect.left + 30 + "px";
+        floatingForm.style.top = rect.top + "px";
+        floatingText.value = '>>' + id.getAttribute('data-id') + '\n';
+        floatingForm.style.display = 'flex';
         open = true;
     }
-    floatingForm.style.display = 'flex';
-    floatingText.value = floatingText.value + '>>' + id.getAttribute('data-id') + '\n';
+    else{
+        let rect = id.getBoundingClientRect();
+        floatingForm.style.left = rect.left + 30 + "px";
+        floatingForm.style.top = rect.top + "px";
+        floatingText.value = floatingText.value + '>>' + id.getAttribute('data-id') + '\n';
+    }
 }

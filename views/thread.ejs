@@ -3,7 +3,7 @@
   <head>
     <title><%= title %></title>
     <link rel='stylesheet' href='/stylesheets/style.css' />
-    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   </head>
   <body>
     <div style="border: 1px solid green">
@@ -52,9 +52,10 @@
     </div>
     <%let repliesNumber = replies.length;%>
 
+    <!--Dodao sam ovo value, pazi na to-->
     <% for (let i = 0; i < replies.length; i++) { %>
       <div id="<%= replies[i].id %>" style="border: 1px solid blue">
-        <input type="checkbox" name="checkbox" value="delete">
+        <input type="checkbox" id="ch<%=replies[i].id%>" value="<%=replies[i].id%>" data-cookie="<%=replies[i].cookie%>">
         <span id="reply_username<%=replies[i].id%>"><b><%=replies[i].username%></b> <%if(replies[i].tripcode != null){%><%='!' + replies[i].tripcode%><%}%></span>
         <span id="reply_time<%=replies[i].id%>"><%=replies[i].created_at %></span>
         <a id="reply_id<%=replies[i].id%>" data-id="<%=replies[i].id%>" onclick="formPopUp(this)"><%=replies[i].id%></a>
@@ -81,12 +82,12 @@
       </table>
       <div>
         <input name="uploaded_file" id="file" type="file" style="width: 180px">
-        <button type="submit" style="width: 75px; height: 21px; float: right">Objavi</button>
+        <button id="floating_submit" type="submit" style="width: 75px; height: 21px; float: right">Objavi</button>
       </div>
     </form>
 
-    <a id="floating_reply">Reply</a>
-    <a onclick="">Delete</a>
+    <a id="floating_reply_bottom">Reply</a>
+    <a id="delete">Delete</a>
 
 
     <script>
@@ -97,19 +98,40 @@
         let replyBody = document.getElementById('reply_text' + i);
         let replyText = replyBody.innerText;
         let regex = />>(\d+)/g;
-        let newText = replyText.replace(regex, '<a href="#$1">>>$1</a>')
+        let matches = replyText.match(regex)
+        if (matches === null) continue;
+        let tags = matches.map(match => match.replace(/>>/g, ''));
+        let session_id = decodeURIComponent(document.cookie.slice('session_id='.length));
+        let newText;
+        let replySession;
+        for(let j = 0; j < tags.length; j++){
+          if(document.getElementById('ch'+ tags[j]) == null)
+            continue
+          replySession = document.getElementById('ch' + tags[j]).getAttribute('data-cookie');
+          //problem je u tome sto se zamjeni svaki sa ili prvim statementom ili else statementom. Trebam parcijalno da ih mjenjam
+          if(session_id === replySession){
+            newText = replyText.replace(regex, '<a href="#$1">>>$1 (Ti)</a>')
+          }
+          else{
+            newText = replyText.replace(regex, '<a href="#$1">>>$1</a>')
+          }
+        }
         replyBody.innerHTML = newText;
-      }
+        /*
+        if(session_id === replySession){
+          console.log(replySession)
+          console.log(session_id)
 
+          newText = replyText.replace(regex, '<a href="#$1">>>$1 (Ti)</a>')
+        }
+        else{
+          newText = replyText.replace(regex, '<a href="#$1">>>$1</a>')
+        }
+         */
+      }
     </script>
+    <script src="/javascripts/delete.js"></script>
     <script src="/javascripts/reply_form.js"></script>
     <script src="/javascripts/security_form_check.js"></script>
-    <script>
-      var socket = io.connect('ws://localhost:3000')
-
-      socket.on('new_reply', function(d) {
-        console.log('e')
-      })
-    </script>
   </body>
 </html>
