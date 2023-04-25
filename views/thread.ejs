@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <script src="/socket.io/socket.io.js"></script>
+  </head>
+  <body>
+    <div style="border: 1px solid green">
+      <a id="reply_link">Odgovori</a>
+      <form id="reply_form" action="/b/reply" method="post" enctype="multipart/form-data">
+        <input name="thread_id" type="hidden" value="<%=thread.id%>">
+        <table>
+          <tbody>
+          <tr>
+            <td class="labels">
+              Username
+            </td>
+            <td>
+              <input name="username" type="text">
+              <button type="submit">Objavi</button>
+            </td>
+          </tr>
+          <tr>
+            <td class="labels">
+              Tekst
+            </td>
+            <td style="display: flex; flex-wrap: wrap; flex-direction: column;">
+              <textarea name="text" id="text" cols="36" rows="4" wrap="soft"></textarea>
+            </td>
+          </tr>
+          <tr>
+            <td class="labels">
+              File
+            </td>
+            <td>
+              <input name="uploaded_file" id="file" type="file">
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </form>
+    </div>
+
+    <div style="border: 1px solid red">
+      <input type="checkbox" name="checkbox" value="delete">
+      <span id="thread_subject"><%=thread.thread_topic %></span>
+      <span id="thread_username"><b><%=thread.username%></b> <%if(thread.tripcode != null){%><%='!' + thread.tripcode%><%}%></span>
+      <span id="thread_time"><%=thread.created_at %></span>
+      <a id="thread_id" data-id="<%=thread.id%>" onclick="formPopUp(this)"><%=thread.id%></a>
+      <p id="thread_text"><%=thread.text%></p>
+    </div>
+    <%let repliesNumber = replies.length;%>
+
+    <% for (let i = 0; i < replies.length; i++) { %>
+      <div id="<%= replies[i].id %>" style="border: 1px solid blue">
+        <input type="checkbox" name="checkbox" value="delete">
+        <span id="reply_username<%=replies[i].id%>"><b><%=replies[i].username%></b> <%if(replies[i].tripcode != null){%><%='!' + replies[i].tripcode%><%}%></span>
+        <span id="reply_time<%=replies[i].id%>"><%=replies[i].created_at %></span>
+        <a id="reply_id<%=replies[i].id%>" data-id="<%=replies[i].id%>" onclick="formPopUp(this)"><%=replies[i].id%></a>
+        <pre id="reply_text<%=i%>"><%=replies[i].text%></pre>
+      </div>
+    <% } %>
+
+    <form id="floating_reply_form" class="draggable" action="/b/reply" method="post" enctype="multipart/form-data">
+      <div id="draggable_header">Odgovori <img id="draggable_header_x" style="float: right" alt="X" src="/images/cross.png"></div>
+      <input name="thread_id" type="hidden" value="<%=thread.id%>">
+      <table>
+        <tbody>
+          <tr>
+            <td>
+              <input name="username" id="floating_username" type="text" placeholder="Username">
+            </td>
+          </tr>
+          <tr>
+            <td style="display: flex; flex-wrap: wrap; flex-direction: column;">
+              <textarea name="text" id="floating_text" cols="36" rows="4" wrap="soft" placeholder="Tekst"></textarea>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div>
+        <input name="uploaded_file" id="file" type="file" style="width: 180px">
+        <button type="submit" style="width: 75px; height: 21px; float: right">Objavi</button>
+      </div>
+    </form>
+
+    <a id="floating_reply">Reply</a>
+    <a onclick="">Delete</a>
+
+
+    <script>
+      let repliesNumberS;
+      repliesNumberS = '<%=repliesNumber%>';
+
+      for(let i = 0; i < repliesNumberS; i++){
+        let replyBody = document.getElementById('reply_text' + i);
+        let replyText = replyBody.innerText;
+        let regex = />>(\d+)/g;
+        let newText = replyText.replace(regex, '<a href="#$1">>>$1</a>')
+        replyBody.innerHTML = newText;
+      }
+
+    </script>
+    <script src="/javascripts/reply_form.js"></script>
+    <script src="/javascripts/security_form_check.js"></script>
+    <script>
+      var socket = io.connect('ws://localhost:3000')
+
+      socket.on('new_reply', function(d) {
+        console.log('e')
+      })
+    </script>
+  </body>
+</html>

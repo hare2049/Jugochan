@@ -1,0 +1,55 @@
+body {
+  padding: 50px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+a {
+  color: #00B7FF;
+}
+
+.labels{
+  color: #000;
+  font-weight: 700;
+  width: 100px;
+  border: 1px solid #000;
+  padding: 0 5px;
+  font-size: 10pt;
+}
+
+#floating_reply_form {
+  display: none;
+  /*display: flex;*/
+  flex-direction: column;
+  position: fixed;
+  z-index: 999;
+  background-color: #fff;
+  border: 1px solid #ddd;
+}
+
+
+#draggable_header {
+  -webkit-user-select: none;
+  font-size: 10pt;
+  text-align: center;
+  padding: 0;
+  height: 18px;
+  background-color: #98e;
+  color: #000;
+  font-weight: 700;
+  border: 1px solid #000;
+}
+
+#floating_username{
+  width: 286px;
+}
+
+#floating_text{
+  min-height: 25px;
+  width: 286px;
+  min-width: 286px;
+  margin-bottom: 10px;
+}
+
+input{
+  width: 244px;
+}

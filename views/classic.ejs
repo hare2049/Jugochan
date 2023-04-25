@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css'/>
+  </head>
+  <body>
+    <form action="/b/post" method="post" enctype="multipart/form-data">
+      <table>
+        <tbody>
+          <tr>
+            <td class="labels">
+              Username
+            </td>
+            <td>
+              <input name="username" id="username" type="text">
+            </td>
+          </tr>
+          <tr>
+            <td class="labels">
+              Tema
+            </td>
+            <td>
+              <input name="topic" id="topic" type="text">
+              <button type="submit">Objavi</button>
+            </td>
+          </tr>
+          <tr>
+            <td class="labels">
+              Tekst
+            </td>
+            <td style="display: flex; flex-wrap: wrap; flex-direction: column;">
+              <textarea name="text" id="text" cols="36" rows="4" wrap="soft"></textarea>
+              <!--<span id="textareaErrorMessage"></span>-->
+            </td>
+          </tr>
+          <tr>
+            <td class="labels">
+              File
+            </td>
+            <td>
+              <input name="uploaded_file" id="file" type="file">
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </form>
+    <script src="../javascripts/security_form_check.js"></script>
+  </body>
+</html>
