@@ -28,14 +28,49 @@ const upload = multer({
   }
 });
 
+//ovde sam STAO!!
 router.get('/', function(req, res, next) {
-  res.render('classic', { title: '/b/ - Općenito - Jugochan' });
+  pool.connect(async (err,client,done) => {
+    if(err)
+      return res.send(err);
+    client.query(`SELECT * FROM post WHERE board = $1 ORDER BY most_recent_reply LIMIT 20`, [board], async (err, result) => {
+      let thread_ids = result.rows.map(row => row.id);
+      client.query(`SELECT * FROM replies WHERE post_id = ANY($1::int[]) ORDER BY created_at`, [thread_ids], async(err, resultreplies) => {
+        done()
+        if(err) return res.send(err)
+        res.render('classic', {
+          title: '/b/ - Općenito - Jugochan',
+          threads: result.rows,
+          replies: resultreplies.rows,
+          board: board,
+          pagenum: 1
+        });
+      })
+    })
+  })
 });
 
 router.get('/katalog', function(req, res, next) {
-
-  res.render('catalog', { title: '/b/ - Općenito - Katalog - Jugochan' });
-
+  pool.connect(async (err,client,done) => {
+    if(err)
+      return res.send(err);
+    client.query(`
+              SELECT post.*, COUNT(replies.id) AS reply_count 
+              FROM post 
+              LEFT JOIN replies ON post.id = replies.post_id 
+              WHERE post.board = $1 
+              GROUP BY post.id 
+              ORDER BY most_recent_reply
+      `, [board], async (err, result) => {
+      done()
+      if(err) return res.send(err)
+      console.log(result);
+      res.render('catalog', {
+        title: '/b/ - Općenito - Katalog - Jugochan' ,
+        threads: result.rows
+      });
+    })
+  })
 });
 
 router.get('/arhiva', function(req, res, next) {
@@ -244,5 +279,60 @@ router.delete('/delete', function (req, res) {
     }
   })
 });
+
+
+
+router.get('/:pagenum', function(req, res, next) {
+  const pagenum = req.params.pagenum;
+
+  if(pagenum > 10){
+    res.sendStatus(404);
+  }
+
+  const offset = pagenum * 10;
+
+  pool.connect(async (err,client,done) => {
+    if(err)
+      return res.send(err);
+    client.query(`SELECT * FROM post WHERE board = $1 ORDER BY most_recent_reply LIMIT 20 OFFSET $2`, [board, offset], async (err, result) => {
+      let thread_ids = result.rows.map(row => row.id);
+      client.query(`SELECT * FROM replies WHERE post_id = ANY($1::int[]) ORDER BY created_at`, [thread_ids], async(err, resultreplies) => {
+        done()
+        if(err) return res.send(err)
+        res.render('classic', {
+          title: '/b/ - Općenito - Jugochan',
+          threads: result.rows,
+          replies: resultreplies.rows,
+          board: board,
+          pagenum: pagenum
+        });
+      })
+    })
+  })
+});
+
+/*
+router.get('/', function(req, res, next) {
+  pool.connect(async (err,client,done) => {
+    if(err)
+      return res.send(err);
+    client.query(`SELECT * FROM post WHERE board = $1 ORDER BY most_recent_reply LIMIT 20`, [board], async (err, result) => {
+      let thread_ids = result.rows.map(row => row.id);
+      client.query(`SELECT * FROM replies WHERE post_id = ANY($1::int[]) ORDER BY created_at`, [thread_ids], async(err, resultreplies) => {
+        done()
+        if(err) return res.send(err)
+        res.render('classic', {
+          title: '/b/ - Općenito - Jugochan',
+          threads: result.rows,
+          replies: resultreplies.rows,
+          board: board,
+          pagenum: 1
+        });
+      })
+    })
+  })
+});
+
+ */
 
 module.exports = router;

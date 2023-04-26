@@ -46,7 +46,48 @@
       </table>
     </form>
 
+    <!--Stao sam ovde-->
+
+    <div id="threads">
+      <% for (let i = 0; i < threads.length; i++) { %>
+      <div class="thread">
+        <img alt class="thumbnail" width="105" height="150" src="/images/<%=threads[i].image_link%>">
+        <a href="/<%=threads[i].board%>/thread/<%=threads[i].id%>"><%=threads[i].id%></a>
+        <b><%=threads[i].thread_topic%> </b><%=threads[i].text%>
+        <b class="expand">x</b>
+        <%let matchingReplies = replies.filter(reply => reply.post_id === threads[i].id);%>
+        <%for (let j = 0; j < matchingReplies.length; j++) {%>
+          <div class="thread_reply">
+            <a href="/<%=threads[i].board%>/thread/<%=threads[i].id%>#<%=matchingReplies[j].id%>"><%=matchingReplies[j].id%></a>
+            <%=matchingReplies[j].text%>
+          </div>
+        <%}%>
+      </div>
+      <% } %>
+    </div>
+
+
+
     <a id="OptionsLink">Options</a>
+    <br>
+    <div id="pagelist">
+      <%if(pagenum != 1){%>
+        <a href="/<%=board%>/<%=parseInt(pagenum)-1%>"> < </a>
+      <%}%>
+      <% for (let i = 1; i < 11; i++) { %>
+      <a href="/<%=board%>/<%=i%>">
+        <%if(i == pagenum){%>
+          <b><%=i%></b>
+        <%}else{%>
+          <%=i%>
+        <%}%>
+      </a>
+      <% } %>
+      <%if(pagenum != 10){%>
+        <a href="/<%=board%>/<%=parseInt(pagenum)+1%>"> > </a>
+      <%}%>
+    </div>
+
     <script src="/javascripts/options.js"></script>
     <script src="../javascripts/security_form_check.js"></script>
   </body>

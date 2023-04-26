@@ -5,6 +5,16 @@
     <link rel='stylesheet' href='/stylesheets/catalog.css' />
   </head>
   <body>
+  <!--width 180px height 320px-->
+  <div id="threads">
+    <% for (let i = 0; i < threads.length; i++) { %>
+      <div class="thread">
+        <a href="/<%=threads[i].board%>/thread/<%=threads[i].id%>"><img alt class="thumbnail" width="105" height="150" src="/images/<%=threads[i].image_link%>"></a>
+          <span class="reply_count">R: <%=threads[i].reply_count%></span>
+          <div class="teaser"><b><%=threads[i].thread_topic%> </b><%=threads[i].text%></div>
+      </div>
+    <% } %>
+  </div>
    <a id="OptionsLink">Options</a>
     <script src="/javascripts/options.js"></script>
   </body>
