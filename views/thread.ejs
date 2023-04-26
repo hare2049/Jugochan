@@ -2,7 +2,7 @@
 <html>
   <head>
     <title><%= title %></title>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <link rel='stylesheet' href='/stylesheets/thread.css' />
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   </head>
   <body>
@@ -42,7 +42,7 @@
       </form>
     </div>
 
-    <div style="border: 1px solid red">
+    <div id="<%= thread.id %>" style="border: 1px solid red">
       <input type="checkbox" name="checkbox" value="delete">
       <span id="thread_subject"><%=thread.thread_topic %></span>
       <span id="thread_username"><b><%=thread.username%></b> <%if(thread.tripcode != null){%><%='!' + thread.tripcode%><%}%></span>
@@ -88,12 +88,14 @@
 
     <a id="floating_reply_bottom">Reply</a>
     <a id="delete">Delete</a>
+    <a id="OptionsLink">Options</a>
 
-
+    <script src="/javascripts/options.js"></script>
     <script>
       let repliesNumberS;
       repliesNumberS = '<%=repliesNumber%>';
-
+      let threadID = document.getElementById('thread_id').getAttribute('data-id');
+      console.log(threadID)
       for(let i = 0; i < repliesNumberS; i++){
         let replyBody = document.getElementById('reply_text' + i);
         let replyText = replyBody.innerText;
@@ -102,32 +104,34 @@
         if (matches === null) continue;
         let tags = matches.map(match => match.replace(/>>/g, ''));
         let session_id = decodeURIComponent(document.cookie.slice('session_id='.length));
-        let newText;
         let replySession;
+        let specificEx;
+
+        console.log(tags);
+
         for(let j = 0; j < tags.length; j++){
-          if(document.getElementById('ch'+ tags[j]) == null)
-            continue
-          replySession = document.getElementById('ch' + tags[j]).getAttribute('data-cookie');
-          //problem je u tome sto se zamjeni svaki sa ili prvim statementom ili else statementom. Trebam parcijalno da ih mjenjam
-          if(session_id === replySession){
-            newText = replyText.replace(regex, '<a href="#$1">>>$1 (Ti)</a>')
+          if(tags[j] !== threadID){
+            if(document.getElementById('ch'+ tags[j]) == null) {
+              replySession = null
+            }
+            else replySession = document.getElementById('ch' + tags[j]).getAttribute('data-cookie');
+          }
+
+          specificEx = new RegExp(">>(" + tags[j] + ")", "g");
+
+
+
+          if(tags[j] === threadID){
+            replyText = replyText.replace(specificEx, '<a href="#$1">>>$1 (OP)</a>')
+          }
+          else if(session_id === replySession){
+            replyText = replyText.replace(specificEx, '<a href="#$1">>>$1 (Ti)</a>')
           }
           else{
-            newText = replyText.replace(regex, '<a href="#$1">>>$1</a>')
+            replyText = replyText.replace(specificEx, '<a href="#$1">>>$1</a>')
           }
         }
-        replyBody.innerHTML = newText;
-        /*
-        if(session_id === replySession){
-          console.log(replySession)
-          console.log(session_id)
-
-          newText = replyText.replace(regex, '<a href="#$1">>>$1 (Ti)</a>')
-        }
-        else{
-          newText = replyText.replace(regex, '<a href="#$1">>>$1</a>')
-        }
-         */
+        replyBody.innerHTML = replyText;
       }
     </script>
     <script src="/javascripts/delete.js"></script>

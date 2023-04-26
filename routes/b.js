@@ -33,7 +33,9 @@ router.get('/', function(req, res, next) {
 });
 
 router.get('/katalog', function(req, res, next) {
+
   res.render('catalog', { title: '/b/ - Općenito - Katalog - Jugochan' });
+
 });
 
 router.get('/arhiva', function(req, res, next) {
@@ -43,7 +45,6 @@ router.get('/arhiva', function(req, res, next) {
 
 
 router.get('/thread/:id', function(req, res, next) {
-  //res.cookie('myCookie', 'cookie-value');
   pool.connect(async (err,client,done) => {
     if(err)
       return res.send(err);
@@ -223,12 +224,24 @@ router.post('/reply', upload.single('uploaded_file'), function(req, res, next){
 
 router.delete('/delete', function (req, res) {
   const ids = req.body.ids.split(',');
+  console.log('admin varijabla: ' + req.app.get('admin'))
   pool.connect(async (err,client,done) => {
     if (err) return res.send(err);
-    client.query(`DELETE FROM replies WHERE replies.id = ANY ($1) AND replies.cookie = $2`, [ids, req.body.cookie], async(err) => {
-      done()
-      if (err) return res.send(err)
-      return res.send({});})
+
+    if(req.app.get('admin' + req.cookies.session_id) === true){
+      client.query(`DELETE FROM replies WHERE replies.id = ANY ($1)`, [ids], async(err) => {
+        done()
+        if (err) return res.send(err)
+        return res.send({});
+      })
+    }
+    else{
+      client.query(`DELETE FROM replies WHERE replies.id = ANY ($1) AND replies.cookie = $2`, [ids, req.body.cookie], async(err) => {
+        done()
+        if (err) return res.send(err)
+        return res.send({});
+      })
+    }
   })
 });
 

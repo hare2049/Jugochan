@@ -6,7 +6,7 @@ var logger = require('morgan');
 var favicon = require('serve-favicon');
 const bcrypt = require('bcrypt');
 
-// var postRouter = require('./routes/post');
+
 
 var indexRouter = require('./routes/index');
 var bRouter = require('./routes/b');
@@ -18,6 +18,7 @@ var polRouter = require('./routes/pol');
 
 
 var app = express();
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -32,20 +33,29 @@ app.use(favicon(__dirname + '/public/images/jugochan.ico'));
 
 //app.use('/post', postRouter);
 
+app.use('/options', function (req, res, next){
+  if(typeof app.get('admin' + req.cookies.session_id) === 'undefined' && req.query.OptionsInput === "sifra"){
+    app.set('admin' + req.cookies.session_id, true);
+    return res.send("Prosao verifikaciju za admina")
+  }
+  else return res.send("Već ste ulogovani ili ne valja sifra");
+})
+
 app.use(function (req, res, next){
-    if(Object.keys(req.cookies).length === 0){
-      let unix_time = toString(Date.now());
-      bcrypt.hash(unix_time, 5, function (err, hash) {
-        if (err) next(err)
-        else {
-          res.cookie('session_id', hash)
-          next()
-        }
+  if(Object.keys(req.cookies).length === 0){
+    let unix_time = toString(Date.now());
+    bcrypt.hash(unix_time, 5, function (err, hash) {
+      if (err) next(err)
+      else {
+        res.cookie('session_id', hash)
+        next()
+      }
     })
   }
     else
       next()
 })
+
 
 app.use('/b', bRouter);
 app.use('/his', hisRouter);
