@@ -6,6 +6,7 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   </head>
   <body>
+    <div id="navbarTop"><span class="boardList">/<a>b</a>/<a>lit</a>/<a>tv</a>/<a>mu</a>/<a>pol</a>/</span><span class="navbarRight">[<a>Options</a>]</span></div>
     <div style="border: 1px solid green">
       <a id="reply_link">Odgovori</a>
       <form id="reply_form" action="/b/reply" method="post" enctype="multipart/form-data">
@@ -90,6 +91,60 @@
     <a id="OptionsLink">Options</a>
 
     <script>
+      let colored = false;
+      function hoverpreview(anchor){
+        console.log(anchor);
+        let targetID = parseInt(anchor.innerHTML.match(/\d+/)[0]);
+        let targetDiv = document.getElementById(targetID);
+
+        let bounding = targetDiv.getBoundingClientRect();
+
+        // Check if the element is in the viewport
+        if (
+          bounding.top >= 0 &&
+          bounding.left >= 0 &&
+          bounding.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+          bounding.right <= (window.innerWidth || document.documentElement.clientWidth)
+        ) {
+          // If the element is in the viewport, change its background color to red
+          targetDiv.style.backgroundColor = "red";
+          colored = true;
+        } else {
+          console.log('u elsu')
+          colored = false;
+
+          console.log(anchor.offsetLeft);
+          console.log(anchor.offsetTop);
+
+          let previewDiv = targetDiv.cloneNode(true);
+                  //document.createElement('div');
+          /*
+          previewDiv.innerText = targetDiv.innerText;
+          previewDiv.style.position = 'absolute';
+          previewDiv.style.top = (event.clientY + 10) + 'px';
+          previewDiv.style.left = (event.clientX + 10) + 'px';
+           */
+          previewDiv.style.left =  anchor.offsetLeft + 50 + "px";
+          previewDiv.style.top = anchor.offsetTop +"px";
+          previewDiv.style.position = "absolute";
+
+          previewDiv.removeAttribute('id');
+          document.body.appendChild(previewDiv);
+
+
+
+          // Remove preview div when mouse leaves
+          anchor.addEventListener('mouseleave', function() {
+            console.log('tu smo');
+            previewDiv.parentNode.removeChild(previewDiv);
+          });
+        }
+      }
+      function hoverleave(anchor){
+        let targetID = parseInt(anchor.innerHTML.match(/\d+/)[0]);
+        let targetDiv = document.getElementById(targetID);
+        if(colored) targetDiv.style.backgroundColor = "white";
+      }
       let repliesNumberS;
       repliesNumberS = '<%=repliesNumber%>';
       let threadID = document.getElementById('thread_id').getAttribute('data-id');
@@ -105,7 +160,6 @@
         let replySession;
         let specificEx;
 
-        console.log(tags);
 
         for(let j = 0; j < tags.length; j++){
           if(tags[j] !== threadID){
@@ -120,13 +174,14 @@
 
 
           if(tags[j] === threadID){
-            replyText = replyText.replace(specificEx, '<a href="#$1">>>$1 (OP)</a>')
+            replyText = replyText.replace(specificEx, `<a onmouseover="hoverpreview(this)" onmouseleave="hoverleave(this)" href="#$1">>>$1(OP)</a>`)
+
           }
           else if(session_id === replySession){
-            replyText = replyText.replace(specificEx, '<a href="#$1">>>$1 (Ti)</a>')
+            replyText = replyText.replace(specificEx, '<a onmouseover="hoverpreview(this)" onmouseleave="hoverleave(this)" href="#$1">>>$1(Ti)</a>')
           }
           else{
-            replyText = replyText.replace(specificEx, '<a href="#$1">>>$1</a>')
+            replyText = replyText.replace(specificEx, '<a onmouseover="hoverpreview(this)" onmouseleave="hoverleave(this)" href="#$1">>>$1</a>')
           }
         }
         replyBody.innerHTML = replyText;

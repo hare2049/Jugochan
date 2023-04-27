@@ -57,12 +57,14 @@
 
 
       <% for (let i = 0; i < threads.length; i++) { %>
-
+      <!--Bilo je id="thread(ovaj kod sa [i])! Pazi!-->
       <div id="thread<%=threads[i].id%>" class="thread" data-expanded="false">
-        <input type="checkbox" id="ch<%=threads[i].id%>" value="t-<%=threads[i].id%>">
-        <img alt class="thumbnail" width="105" height="150" src="/images/<%=threads[i].image_link%>">
-        <a href="/<%=threads[i].board%>/thread/<%=threads[i].id%>"><%=threads[i].id%></a>
-        <b><%=threads[i].thread_topic%> </b><%=threads[i].text%>
+        <div id="<%=threads[i].id%>" style="border: 5px solid chartreuse">
+          <input type="checkbox" id="ch<%=threads[i].id%>" value="t-<%=threads[i].id%>">
+          <img alt class="thumbnail" width="105" height="150" src="/images/<%=threads[i].image_link%>">
+          <a href="/<%=threads[i].board%>/thread/<%=threads[i].id%>"><%=threads[i].id%></a>
+          <b><%=threads[i].thread_topic%> </b><%=threads[i].text%>
+        </div>
         <%let matchingReplies = replies.filter(reply => reply.post_id === threads[i].id);%>
         <%if(matchingReplies.length > 5) {%>
           <b class="expand" onclick="showReplies(this)">x</b>
@@ -93,7 +95,7 @@
           %>
 
           <%for (let j = 0; j < matchingReplies.length-num_of_last_replies; j++) {%>
-            <div class="thread_reply">
+            <div id="<%= matchingReplies[j].id %>" class="thread_reply" data-hidden="true">
               <input type="checkbox" id="ch<%=matchingReplies[j].id%>" value="<%=matchingReplies[j].id%>" data-cookie="<%=matchingReplies[j].cookie%>">
 
               <!--<a href="/<%=threads[i].board%>/thread/<%=threads[i].id%>#<%=matchingReplies[j].id%>"><%=matchingReplies[j].id%></a>-->
@@ -158,6 +160,62 @@
 
     <script>
 
+      let colored = false;
+      function hoverpreview(anchor){
+        console.log(anchor.innerHTML);
+        let targetID = parseInt(anchor.innerHTML.match(/\d+/)[0]);
+        let targetDiv = document.getElementById(targetID);
+
+        console.log(targetID)
+        console.log(targetDiv);
+        let isHidden = targetDiv.dataset.hidden;
+
+        let bounding = targetDiv.getBoundingClientRect();
+        // Check if the element is in the viewport
+
+
+        /*  MOZDA   OVO   DORADITI  JEDNOM  */
+        //console.log(targetDiv.parentElement.parentElement.getAttribute('data-expanded'))
+
+        if (
+          bounding.top >= 0 &&
+          bounding.left >= 0 &&
+          bounding.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+          bounding.right <= (window.innerWidth || document.documentElement.clientWidth)
+                && isHidden !== "true"
+        ) {
+          // If the element is in the viewport, change its background color to red
+          targetDiv.style.backgroundColor = "red";
+          colored = true;
+        } else {
+          console.log('u elsu')
+          colored = false;
+
+          let previewDiv = targetDiv.cloneNode(true);
+          previewDiv.style.left =  anchor.offsetLeft + 50 + "px";
+          previewDiv.style.top = anchor.offsetTop +"px";
+          previewDiv.style.position = "absolute";
+
+          previewDiv.removeAttribute('id');
+          document.body.appendChild(previewDiv);
+
+          // Remove preview div when mouse leaves
+          anchor.addEventListener('mouseleave', function() {
+            console.log('tu smo');
+            console.log(previewDiv.parentNode)
+            previewDiv.parentNode.removeChild(previewDiv);
+          });
+        }
+      }
+
+
+      function hoverleave(anchor){
+        console.log(anchor.innerHTML)
+        let targetID = parseInt(anchor.innerHTML.match(/\d+/)[0]);
+        let targetDiv = document.getElementById(targetID);
+        if(colored) targetDiv.style.backgroundColor = "white";
+      }
+
 /*
         const regex = /&gt;&gt;(\d+)/g; // Regular expression to match the pattern `>>(number)`
         const replacement = `<a href="/b/${RepliesToIdsMap.get(parseInt($1))}#$1">>>$1</a>`;
@@ -176,9 +234,9 @@
         const target = RepliesToIdsMap.get(id);
 
         if(target === id){
-          return `<a href="/b/thread/${target}#${id}">>>${id} (OP)</a>`;
+          return `<a href="/b/thread/${target}#${id}" onmouseover="hoverpreview(this)" onmouseleave="hoverleave(this)">>>${id}(OP)</a>`;
         }
-        else return `<a href="/b/thread/${target}#${id}">>>${id}</a>`;
+        else return `<a href="/b/thread/${target}#${id}" onmouseover="hoverpreview(this)" onmouseleave="hoverleave(this)">>>${id}</a>`;
       });
 
       document.body.innerHTML = newContent;
