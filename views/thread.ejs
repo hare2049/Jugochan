@@ -43,7 +43,7 @@
     </div>
 
     <div id="<%= thread.id %>" style="border: 1px solid red">
-      <input type="checkbox" name="checkbox" value="delete">
+      <input type="checkbox" id="ch<%=thread.id%>" value="t-<%=thread.id%>">
       <span id="thread_subject"><%=thread.thread_topic %></span>
       <span id="thread_username"><b><%=thread.username%></b> <%if(thread.tripcode != null){%><%='!' + thread.tripcode%><%}%></span>
       <span id="thread_time"><%=thread.created_at %></span>
@@ -52,7 +52,6 @@
     </div>
     <%let repliesNumber = replies.length;%>
 
-    <!--Dodao sam ovo value, pazi na to-->
     <% for (let i = 0; i < replies.length; i++) { %>
       <div id="<%= replies[i].id %>" style="border: 1px solid blue">
         <input type="checkbox" id="ch<%=replies[i].id%>" value="<%=replies[i].id%>" data-cookie="<%=replies[i].cookie%>">
@@ -90,12 +89,11 @@
     <a id="delete">Delete</a>
     <a id="OptionsLink">Options</a>
 
-    <script src="/javascripts/options.js"></script>
     <script>
       let repliesNumberS;
       repliesNumberS = '<%=repliesNumber%>';
       let threadID = document.getElementById('thread_id').getAttribute('data-id');
-      console.log(threadID)
+
       for(let i = 0; i < repliesNumberS; i++){
         let replyBody = document.getElementById('reply_text' + i);
         let replyText = replyBody.innerText;
@@ -134,6 +132,7 @@
         replyBody.innerHTML = replyText;
       }
     </script>
+    <script src="/javascripts/options.js"></script>
     <script src="/javascripts/delete.js"></script>
     <script src="/javascripts/reply_form.js"></script>
     <script src="/javascripts/security_form_check.js"></script>

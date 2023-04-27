@@ -33,7 +33,7 @@ router.get('/', function(req, res, next) {
   pool.connect(async (err,client,done) => {
     if(err)
       return res.send(err);
-    client.query(`SELECT * FROM post WHERE board = $1 ORDER BY most_recent_reply LIMIT 20`, [board], async (err, result) => {
+    client.query(`SELECT * FROM post WHERE board = $1 ORDER BY most_recent_reply DESC LIMIT 20`, [board], async (err, result) => {
       let thread_ids = result.rows.map(row => row.id);
       client.query(`SELECT * FROM replies WHERE post_id = ANY($1::int[]) ORDER BY created_at`, [thread_ids], async(err, resultreplies) => {
         done()
@@ -60,9 +60,10 @@ router.get('/katalog', function(req, res, next) {
               LEFT JOIN replies ON post.id = replies.post_id 
               WHERE post.board = $1 
               GROUP BY post.id 
-              ORDER BY most_recent_reply
+              ORDER BY most_recent_reply DESC
       `, [board], async (err, result) => {
       done()
+      console.log(result.rows)
       if(err) return res.send(err)
       console.log(result);
       res.render('catalog', {
@@ -74,7 +75,20 @@ router.get('/katalog', function(req, res, next) {
 });
 
 router.get('/arhiva', function(req, res, next) {
-  res.render('archive', { title: '/b/ - Općenito - Arhiva - Jugochan' });
+  pool.connect(async (err, client, done) => {
+    if(err)
+      return res.send(err)
+    client.query(`SELECT * FROM post WHERE board = $1 ORDER BY most_recent_reply DESC OFFSET 200`, [board], async(err, result) => {
+      done()
+      if(err) res.send(err);
+      console.log(result);
+      res.render('archive', {
+        title: '/b/ - Općenito - Arhiva - Jugochan',
+        threads: result.rows,
+        board: board
+      });
+    })
+  })
 });
 
 
@@ -84,6 +98,9 @@ router.get('/thread/:id', function(req, res, next) {
     if(err)
       return res.send(err);
     client.query(`SELECT * FROM post WHERE id = $1`, [req.params.id], async(err, result) => {
+      if(err) return res.send(err)
+      if(result.rows.length === 0)
+        return res.send("Thread does not exist")
       client.query(`SELECT * FROM replies WHERE post_id = $1`, [req.params.id], async(err, replies) => {
         done()
         if (err)
@@ -259,19 +276,43 @@ router.post('/reply', upload.single('uploaded_file'), function(req, res, next){
 
 router.delete('/delete', function (req, res) {
   const ids = req.body.ids.split(',');
+  const thread_ids_with_t = ids.filter(val => val.startsWith('t-'));
+  const thread_ids = thread_ids_with_t.map(val => val.slice(2));
+  const reply_ids = ids.filter(val => !val.startsWith('t-'));
+
+  console.log(ids);
+  console.log(thread_ids);
+  console.log(reply_ids);
   console.log('admin varijabla: ' + req.app.get('admin'))
   pool.connect(async (err,client,done) => {
     if (err) return res.send(err);
 
     if(req.app.get('admin' + req.cookies.session_id) === true){
-      client.query(`DELETE FROM replies WHERE replies.id = ANY ($1)`, [ids], async(err) => {
-        done()
-        if (err) return res.send(err)
-        return res.send({});
+      client.query(`DELETE FROM replies WHERE replies.id = ANY ($1)`, [reply_ids], async(err) => {
+        if (err) {
+          done();
+          return res.send(err);
+        }
+
+        client.query(`DELETE FROM replies WHERE post_id IN (SELECT id FROM post WHERE id=ANY($1))`, [thread_ids], async (err) => {
+          if (err) {
+            done();
+            return res.send(err);
+          }
+
+          client.query(`DELETE FROM post WHERE id = ANY($1)`, [thread_ids], async (err) => {
+            done();
+            if(err) return res.send(err);
+            return res.send({});
+          })
+
+
+        })
+
       })
     }
     else{
-      client.query(`DELETE FROM replies WHERE replies.id = ANY ($1) AND replies.cookie = $2`, [ids, req.body.cookie], async(err) => {
+      client.query(`DELETE FROM replies WHERE replies.id = ANY ($1) AND replies.cookie = $2`, [reply_ids, req.body.cookie], async(err) => {
         done()
         if (err) return res.send(err)
         return res.send({});
@@ -289,12 +330,12 @@ router.get('/:pagenum', function(req, res, next) {
     res.sendStatus(404);
   }
 
-  const offset = pagenum * 10;
+  const offset = (pagenum-1) * 20;
 
   pool.connect(async (err,client,done) => {
     if(err)
       return res.send(err);
-    client.query(`SELECT * FROM post WHERE board = $1 ORDER BY most_recent_reply LIMIT 20 OFFSET $2`, [board, offset], async (err, result) => {
+    client.query(`SELECT * FROM post WHERE board = $1 ORDER BY most_recent_reply DESC LIMIT 20 OFFSET $2`, [board, offset], async (err, result) => {
       let thread_ids = result.rows.map(row => row.id);
       client.query(`SELECT * FROM replies WHERE post_id = ANY($1::int[]) ORDER BY created_at`, [thread_ids], async(err, resultreplies) => {
         done()
@@ -310,29 +351,5 @@ router.get('/:pagenum', function(req, res, next) {
     })
   })
 });
-
-/*
-router.get('/', function(req, res, next) {
-  pool.connect(async (err,client,done) => {
-    if(err)
-      return res.send(err);
-    client.query(`SELECT * FROM post WHERE board = $1 ORDER BY most_recent_reply LIMIT 20`, [board], async (err, result) => {
-      let thread_ids = result.rows.map(row => row.id);
-      client.query(`SELECT * FROM replies WHERE post_id = ANY($1::int[]) ORDER BY created_at`, [thread_ids], async(err, resultreplies) => {
-        done()
-        if(err) return res.send(err)
-        res.render('classic', {
-          title: '/b/ - Općenito - Jugochan',
-          threads: result.rows,
-          replies: resultreplies.rows,
-          board: board,
-          pagenum: 1
-        });
-      })
-    })
-  })
-});
-
- */
 
 module.exports = router;

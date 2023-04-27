@@ -6,5 +6,16 @@
   </head>
   <body>
     archive
+  <div id="threads">
+    <% for (let i = 0; i < threads.length; i++) { %>
+    <div id="thread<%=threads[i].id%>" class="thread">
+      <span><%=threads[i].thread_topic%> ' ' <%=threads[i].text%></span>
+    </div>
+    <%}%>
+  </div>
+
+  <a id="delete">Delete</a>
+
+
   </body>
 </html>

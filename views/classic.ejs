@@ -3,6 +3,7 @@
   <head>
     <title><%= title %></title>
     <link rel='stylesheet' href='/stylesheets/classic.css'/>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   </head>
   <body>
     <form action="/b/post" method="post" enctype="multipart/form-data">
@@ -49,20 +50,85 @@
     <!--Stao sam ovde-->
 
     <div id="threads">
+
+
+      <%let repliesNumber = replies.length;%>
+      <%let RepliesToIds = new Map();%>
+
+
       <% for (let i = 0; i < threads.length; i++) { %>
-      <div class="thread">
+
+      <div id="thread<%=threads[i].id%>" class="thread" data-expanded="false">
+        <input type="checkbox" id="ch<%=threads[i].id%>" value="t-<%=threads[i].id%>">
         <img alt class="thumbnail" width="105" height="150" src="/images/<%=threads[i].image_link%>">
         <a href="/<%=threads[i].board%>/thread/<%=threads[i].id%>"><%=threads[i].id%></a>
         <b><%=threads[i].thread_topic%> </b><%=threads[i].text%>
-        <b class="expand">x</b>
         <%let matchingReplies = replies.filter(reply => reply.post_id === threads[i].id);%>
-        <%for (let j = 0; j < matchingReplies.length; j++) {%>
-          <div class="thread_reply">
-            <a href="/<%=threads[i].board%>/thread/<%=threads[i].id%>#<%=matchingReplies[j].id%>"><%=matchingReplies[j].id%></a>
-            <%=matchingReplies[j].text%>
-          </div>
+        <%if(matchingReplies.length > 5) {%>
+          <b class="expand" onclick="showReplies(this)">x</b>
         <%}%>
+        <div class="thread_replies_minus_five">
+          <%
+            let num_of_last_replies;
+            switch (matchingReplies.length - 5) {
+              case -5:
+                num_of_last_replies = 0;
+                break;
+              case -4:
+                num_of_last_replies = 1;
+                break;
+              case -3:
+                num_of_last_replies = 2;
+                break;
+              case -2:
+                num_of_last_replies = 3;
+                break;
+              case -1:
+                num_of_last_replies = 4;
+                break;
+              default:
+                num_of_last_replies = 5;
+                break
+            }
+          %>
+
+          <%for (let j = 0; j < matchingReplies.length-num_of_last_replies; j++) {%>
+            <div class="thread_reply">
+              <input type="checkbox" id="ch<%=matchingReplies[j].id%>" value="<%=matchingReplies[j].id%>" data-cookie="<%=matchingReplies[j].cookie%>">
+
+              <!--<a href="/<%=threads[i].board%>/thread/<%=threads[i].id%>#<%=matchingReplies[j].id%>"><%=matchingReplies[j].id%></a>-->
+
+              <span id="reply_username<%=matchingReplies[j].id%>"><b><%=matchingReplies[j].username%></b> <%if(matchingReplies[j].tripcode != null){%><%='!' + matchingReplies[j].tripcode%><%}%></span>
+              <span id="reply_time<%=matchingReplies[j].id%>"><%=matchingReplies[j].created_at %></span>
+              <a id="reply_id<%=matchingReplies[j].id%>" data-id="<%=matchingReplies[j].id%>" onclick="formPopUp(this)"><%=matchingReplies[j].id%></a>
+              <pre id="reply_text<%=i%>"><%=matchingReplies[j].text%></pre>
+
+              <%RepliesToIds.set(matchingReplies[j].id,threads[i].id)%>
+
+            </div>
+          <%}%>
+        </div>
+        <div class="last_five">
+          <%for (let j = matchingReplies.length-num_of_last_replies; j < matchingReplies.length; j++) {%>
+          <div id="<%= matchingReplies[j].id %>"  class="thread_reply">
+            <input type="checkbox" id="ch<%=matchingReplies[j].id%>" value="<%=matchingReplies[j].id%>" data-cookie="<%=matchingReplies[j].cookie%>">
+
+            <!--<a href="/<%=threads[i].board%>/thread/<%=threads[i].id%>#<%=matchingReplies[j].id%>"><%=matchingReplies[j].id%></a>-->
+
+            <span id="reply_username<%=matchingReplies[j].id%>"><b><%=matchingReplies[j].username%></b> <%if(matchingReplies[j].tripcode != null){%><%='!' + matchingReplies[j].tripcode%><%}%></span>
+            <span id="reply_time<%=matchingReplies[j].id%>"><%=matchingReplies[j].created_at %></span>
+            <a id="reply_id<%=matchingReplies[j].id%>" data-id="<%=matchingReplies[j].id%>" onclick="formPopUp(this)"><%=matchingReplies[j].id%></a>
+            <pre id="reply_text<%=i%>"><%=matchingReplies[j].text%></pre>
+
+            <%RepliesToIds.set(matchingReplies[j].id,threads[i].id)%>
+
+          </div>
+          <%}%>
+        </div>
       </div>
+
+      <%RepliesToIds.set(threads[i].id,threads[i].id)%>
+
       <% } %>
     </div>
 
@@ -88,7 +154,44 @@
       <%}%>
     </div>
 
+
+
+    <script>
+
+/*
+        const regex = /&gt;&gt;(\d+)/g; // Regular expression to match the pattern `>>(number)`
+        const replacement = `<a href="/b/${RepliesToIdsMap.get(parseInt($1))}#$1">>>$1</a>`;
+        const pageContent = document.body.innerHTML;
+        const newContent = pageContent.replace(regex, replacement);
+        document.body.innerHTML = newContent;
+*/
+
+      let RepliesToIdsMap = new Map(JSON.parse('<%- JSON.stringify(Array.from(RepliesToIds.entries())) %>'));
+      const regex = /&gt;&gt;(\d+)/g; // Regular expression to match the pattern `>>(number)`
+      const pageContent = document.body.innerHTML;
+
+      // Use a function to generate the replacement string dynamically
+      const newContent = pageContent.replace(regex, function(match, p1) {
+        const id = parseInt(p1);
+        const target = RepliesToIdsMap.get(id);
+
+        if(target === id){
+          return `<a href="/b/thread/${target}#${id}">>>${id} (OP)</a>`;
+        }
+        else return `<a href="/b/thread/${target}#${id}">>>${id}</a>`;
+      });
+
+      document.body.innerHTML = newContent;
+
+    </script>
+
+
+    <a id="delete">Delete</a>
+
+    <!--<script src="/javascripts/reply_form.js"></script>-->
+    <script src="/javascripts/delete.js"></script>
     <script src="/javascripts/options.js"></script>
-    <script src="../javascripts/security_form_check.js"></script>
+    <script src="/javascripts/security_form_check.js"></script>
+    <script src="/javascripts/showReplies.js"></script>
   </body>
 </html>

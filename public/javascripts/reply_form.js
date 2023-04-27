@@ -2,6 +2,7 @@
 document.getElementById("reply_form").style.display = "none";
 
 // Handle the click event on the "Post a reply" link
+
 document.getElementById("reply_link").addEventListener("click", function(e) {
     e.preventDefault(); // Prevent the default link behavior
 
@@ -10,7 +11,6 @@ document.getElementById("reply_link").addEventListener("click", function(e) {
 
     document.getElementById("reply_form").style.display = "block";
 });
-
 let x = document.getElementById('draggable_header_x');
 x.addEventListener('click', () => {
     floatingForm.style.display = 'none';
