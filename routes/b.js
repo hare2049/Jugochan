@@ -108,6 +108,7 @@ router.get('/thread/:id', function(req, res, next) {
         res.render('thread', {
           title: ('/b/ - ' + result.rows[0].thread_topic + ' ' + result.rows[0].text).substring(0, 47) + '...',
           thread: result.rows[0],
+          board: board,
           replies: replies.rows
         });
       });
@@ -262,7 +263,7 @@ router.post('/reply', upload.single('uploaded_file'), function(req, res, next){
         client.query(`SELECT last_value FROM thread_number`, [], async(err, result) => {
           if(err)
             return res.send(err);
-          client.query(`INSERT INTO replies(username, text, image_link, post_id, cookie) VALUES($1,$2,$3,$4,$5);`, [req.body.username, req.body.text, req.file.filename, req.body.thread_id, req.cookie.session_id], async(err) => {
+          client.query(`INSERT INTO replies(username, text, image_link, post_id, cookie) VALUES($1,$2,$3,$4,$5);`, [req.body.username, req.body.text, req.file.filename, req.body.thread_id, req.cookies.session_id], async(err) => {
             done()
             if(err)
               return res.send(err);
@@ -320,7 +321,6 @@ router.delete('/delete', function (req, res) {
     }
   })
 });
-
 
 
 router.get('/:pagenum', function(req, res, next) {

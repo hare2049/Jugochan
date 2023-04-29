@@ -56,6 +56,10 @@ app.use(function (req, res, next){
       next()
 })
 
+app.use('/image/:image_link', function (req, res, next){
+  res.render('image', {title: req.params.image_link, image_link: req.params.image_link})
+})
+
 
 app.use('/b', bRouter);
 app.use('/his', hisRouter);

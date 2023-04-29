@@ -7,7 +7,8 @@ document.getElementById("reply_link").addEventListener("click", function(e) {
     e.preventDefault(); // Prevent the default link behavior
 
     // Show the reply form
-    document.getElementById("reply_link").style.display = "none";
+
+    document.getElementById("replyLinkSpan").style.display = "none";
 
     document.getElementById("reply_form").style.display = "block";
 });
@@ -68,6 +69,13 @@ function formPopUp(id){
         let rect = id.getBoundingClientRect();
         floatingForm.style.left = rect.left + 30 + "px";
         floatingForm.style.top = rect.top + "px";
-        floatingText.value = floatingText.value + '>>' + id.getAttribute('data-id') + '\n';
+
+        const cursorPosition = floatingText.selectionStart;
+        const currentValue = floatingText.value;
+        const newValue = currentValue.slice(0, cursorPosition) + '>>' + id.getAttribute('data-id') + '\n' + currentValue.slice(cursorPosition);
+        floatingText.value = newValue;
+        floatingText.selectionStart = floatingText.selectionEnd = cursorPosition + ('>>' + id.getAttribute('data-id') + '\n').length;
+
+        //floatingText.value = floatingText.value + '>>' + id.getAttribute('data-id') + '\n';
     }
 }

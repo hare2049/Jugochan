@@ -3,66 +3,186 @@
   <head>
     <title><%= title %></title>
     <link rel='stylesheet' href='/stylesheets/thread.css' />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   </head>
   <body>
-    <div id="navbarTop"><span class="boardList">/<a>b</a>/<a>lit</a>/<a>tv</a>/<a>mu</a>/<a>pol</a>/</span><span class="navbarRight">[<a>Options</a>]</span></div>
-    <div style="border: 1px solid green">
-      <a id="reply_link">Odgovori</a>
-      <form id="reply_form" action="/b/reply" method="post" enctype="multipart/form-data">
-        <input name="thread_id" type="hidden" value="<%=thread.id%>">
-        <table>
-          <tbody>
-          <tr>
-            <td class="labels">
-              Username
-            </td>
-            <td>
-              <input name="username" type="text">
-              <button type="submit">Objavi</button>
-            </td>
-          </tr>
-          <tr>
-            <td class="labels">
-              Tekst
-            </td>
-            <td style="display: flex; flex-wrap: wrap; flex-direction: column;">
-              <textarea name="text" id="text" cols="36" rows="4" wrap="soft"></textarea>
-            </td>
-          </tr>
-          <tr>
-            <td class="labels">
-              File
-            </td>
-            <td>
-              <input name="uploaded_file" id="file" type="file">
-            </td>
-          </tr>
-          </tbody>
-        </table>
-      </form>
-    </div>
 
-    <div id="<%= thread.id %>" style="border: 1px solid red">
-      <input type="checkbox" id="ch<%=thread.id%>" value="t-<%=thread.id%>">
-      <span id="thread_subject"><%=thread.thread_topic %></span>
-      <span id="thread_username"><b><%=thread.username%></b> <%if(thread.tripcode != null){%><%='!' + thread.tripcode%><%}%></span>
-      <span id="thread_time"><%=thread.created_at %></span>
-      <a id="thread_id" data-id="<%=thread.id%>" onclick="formPopUp(this)"><%=thread.id%></a>
-      <p id="thread_text"><%=thread.text%></p>
-    </div>
-    <%let repliesNumber = replies.length;%>
+    <div class="navbar"><span class="boardList"> / <a href="/b" class="navbar_anchor">b</a> / <a href="/lit" class="navbar_anchor">lit</a> / <a href="/tv" class="navbar_anchor">tv</a> / <a href="/mu" class="navbar_anchor">mu</a> / <a href="/pol" class="navbar_anchor">pol</a> / </span> <span class="navbarRight">[<a id="delete1" class="navbar_anchor">Delete</a>] [<a class="navbar_anchor optionsLink">Options</a>]</span> </div>
 
-    <% for (let i = 0; i < replies.length; i++) { %>
-      <div id="<%= replies[i].id %>" style="border: 1px solid blue">
-        <input type="checkbox" id="ch<%=replies[i].id%>" value="<%=replies[i].id%>" data-cookie="<%=replies[i].cookie%>">
-        <span id="reply_username<%=replies[i].id%>"><b><%=replies[i].username%></b> <%if(replies[i].tripcode != null){%><%='!' + replies[i].tripcode%><%}%></span>
-        <span id="reply_time<%=replies[i].id%>"><%=replies[i].created_at %></span>
-        <a id="reply_id<%=replies[i].id%>" data-id="<%=replies[i].id%>" onclick="formPopUp(this)"><%=replies[i].id%></a>
-        <pre id="reply_text<%=i%>"><%=replies[i].text%></pre>
+
+    <div class="boardBanner">
+      <img alt="Jugochan" src="/images/<%=board%>_banner.jpg" class="boardBannerImage">
+      <div class="boardTitle">
+
+        <%
+        let board_title;
+        switch (board) {
+          case 'b':
+            board_title = '/b/ - Općenito';
+            break;
+          case 'his':
+            board_title = '/his/ - Historija';
+            break;
+          case 'lit':
+            board_title = '/lit/ - Literatura';
+            break;
+          case 'mu':
+            board_title = '/mu/ - Muzika';
+            break;
+          case 'pol':
+            board_title = '/pol/ - Politika';
+            break;
+        }%>
+        <%=board_title%>
       </div>
-    <% } %>
+    </div>
 
+      <div id="togglePostFormLink">
+        <span id="replyLinkSpan"> [ <a id="reply_link">Odgovori</a> ] </span>
+        <form id="reply_form" action="/b/reply" method="post" enctype="multipart/form-data">
+          <input name="thread_id" type="hidden" value="<%=thread.id%>">
+          <table>
+            <tbody>
+            <tr>
+              <td class="labels">
+                Username
+              </td>
+              <td>
+                <input id="username" name="username" type="text">
+                <button type="submit">Objavi</button>
+              </td>
+            </tr>
+            <tr>
+              <td class="labels">
+                Tekst
+              </td>
+              <td style="display: flex; flex-wrap: wrap; flex-direction: column;">
+                <textarea name="text" id="text" cols="36" rows="4" wrap="soft"></textarea>
+              </td>
+            </tr>
+            <tr>
+              <td class="labels">
+                File
+              </td>
+              <td>
+                <input name="uploaded_file" id="file" type="file">
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </form>
+      </div>
+
+    <div id="navLinksTop">
+      [<a href="/<%=board%>">Nazad</a>]
+      [<a href="/<%=board%>/Katalog">Katalog</a>]
+      [<a href="#bottom">Bottom</a>]
+      [<a href="/<%=board%>/thread/<%=thread.id%>">Update</a>]
+    </div>
+
+    <div id="thread">
+    <div id="<%=thread.id%>" class="opThread post_div">
+        <!--Ovo cu da uklonim, pazi ako bude bugova u buducnosti-->
+      <!--<div id="<%= thread.id %>" style="border: 1px solid red">-->
+        <div class="file">
+          <div class="fileText">
+            File:  <a href="/image/<%=thread.image_link%>" target="_blank"><%=thread.image_link%></a>
+          </div>
+          <a href="/image/<%=thread.image_link%>" target ="_blank" onclick="return handleClick(event)">
+            <img alt id="threadImage" onclick="toggleImageSize(this)" class="imageBeforeClick" src="/images/<%=thread.image_link%>">
+          </a>
+        </div>
+        <div class="postInfo"></div>
+          <input type="checkbox" id="ch<%=thread.id%>" value="t-<%=thread.id%>">
+        <span id="thread_subject"><%=thread.thread_topic %> </span>
+        <span id="thread_username" class="post_username"><b><%=thread.username%></b> <%if(thread.tripcode != null){%><%='!' + thread.tripcode%><%}%></span>
+        <%
+        // Convert the string into a JavaScript Date object
+        let dateObj = new Date(thread.created_at);
+
+        // Get the day of the week (e.g. "Sunday", "Monday", etc.) as a string
+        let dayOfWeek = dateObj.toLocaleString("en-US", { weekday: "long" });
+
+        // Format the date and time string as "YYYY-MM-DD (Day of the week) HH:MM:SS"
+        let formattedDateTime = dateObj.toLocaleString("en-US", {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit"
+        }) + ` (${dayOfWeek})`;
+
+        %>
+        <span id="thread_time" class="post_time"><%=formattedDateTime %></span>
+        <a class="post_id" id="thread_id" data-id="<%=thread.id%>" onclick="formPopUp(this)">No. <%=thread.id%></a>
+        <span id="tags<%=thread.id%>" class="allTags"></span>
+        <blockquote class="postMessage"><%=thread.text%></blockquote>
+      </div>
+
+      <!-- </div>-->
+       <%let repliesNumber = replies.length;%>
+
+        <% for (let i = 0; i < replies.length; i++) { %>
+          <div id="<%= replies[i].id %>" class="post_div reply_div">
+            <%if(replies[i].image_link != null){%>
+            <div class="file">
+              <div class="fileText">
+                File:  <a href="/image/<%=replies[i].image_link%>" target="_blank"><%=replies[i].image_link%></a>
+              </div>
+              <a href="/image/<%=replies[i].image_link%>" target ="_blank" onclick="return handleClick(event)">
+                <img alt onclick="toggleImageSize(this)" class="imageBeforeClick" src="/images/<%=replies[i].image_link%>">
+              </a>
+            </div>
+            <%}%>
+            <div class="postInfo"></div>
+            <input type="checkbox" id="ch<%=replies[i].id%>" value="<%=replies[i].id%>" data-cookie="<%=replies[i].cookie%>">
+            <%if(replies[i].username){%>
+            <span id="reply_username<%=replies[i].id%>" class="post_username"><b><%=replies[i].username%></b> <%if(replies[i].tripcode != null){%><%='!' + replies[i].tripcode%><%}%></span>
+            <%}else{%>
+            <span id="reply_username<%=replies[i].id%>" class="post_username"><b>Anoniman</b> <%if(replies[i].tripcode != null){%><%='!' + replies[i].tripcode%><%}%></span>
+            <%}%>
+            <%
+              // Convert the string into a JavaScript Date object
+              let dateObj = new Date(replies[i].created_at);
+
+              // Get the day of the week (e.g. "Sunday", "Monday", etc.) as a string
+              let dayOfWeek = dateObj.toLocaleString("en-US", { weekday: "long" });
+
+              // Format the date and time string as "YYYY-MM-DD (Day of the week) HH:MM:SS"
+              let formattedDateTime = dateObj.toLocaleString("en-US", {
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit"
+              }) + ` (${dayOfWeek})`;
+
+            %>
+            <span class="post_time"><%=formattedDateTime %></span>
+            <a class="post_id" id="thread_id" data-id="<%=replies[i].id%>" onclick="formPopUp(this)">No. <%=replies[i].id%></a>
+            <span id="tags<%=replies[i].id%>" class="allTags"></span>
+            <blockquote id="reply_text<%=i%>" class="postMessage"><%=replies[i].text%></blockquote>
+
+            <!--
+            <input type="checkbox" id="ch<%=replies[i].id%>" value="<%=replies[i].id%>" data-cookie="<%=replies[i].cookie%>">
+            <span id="reply_username<%=replies[i].id%>"><b><%=replies[i].username%></b> <%if(replies[i].tripcode != null){%><%='!' + replies[i].tripcode%><%}%></span>
+            <span id="reply_time<%=replies[i].id%>"><%=replies[i].created_at %></span>
+            <a id="reply_id<%=replies[i].id%>" data-id="<%=replies[i].id%>" onclick="formPopUp(this)"><%=replies[i].id%></a>
+            <pre id="reply_text<%=i%>"><%=replies[i].text%></pre>
+            -->
+          </div>
+        <% } %>
+
+    </div>
+    <div id="navLinksBottom">
+      [<a href="/<%=board%>">Nazad</a>]
+      [<a href="/<%=board%>/Katalog">Katalog</a>]
+      [<a href="#navLinksTop">Top</a>]
+      [<a href="/<%=board%>/thread/<%=thread.id%>">Update</a>]
+    </div>
     <form id="floating_reply_form" class="draggable" action="/b/reply" method="post" enctype="multipart/form-data">
       <div id="draggable_header">Odgovori <img id="draggable_header_x" style="float: right" alt="X" src="/images/cross.png"></div>
       <input name="thread_id" type="hidden" value="<%=thread.id%>">
@@ -86,15 +206,21 @@
       </div>
     </form>
 
-    <a id="floating_reply_bottom">Reply</a>
-    <a id="delete">Delete</a>
-    <a id="OptionsLink">Options</a>
+    <div id="bottom">
+      <span id="replyLinkSpanBottom"> [ <a id="floating_reply_bottom">Odgovori</a> ] </span>
+    </div>
+
+    <div class="navbar"><span class="boardList"> / <a href="/b" class="navbar_anchor">b</a> / <a href="/lit" class="navbar_anchor">lit</a> / <a href="/tv" class="navbar_anchor">tv</a> / <a href="/mu" class="navbar_anchor">mu</a> / <a href="/pol" class="navbar_anchor">pol</a> / </span> <span class="navbarRight">[<a id="delete2" class="navbar_anchor">Delete</a>] [<a class="navbar_anchor optionsLink">Options</a>]</span> </div>
+
+
 
     <script>
       let colored = false;
+      let currentlyColored = null;
       function hoverpreview(anchor){
         console.log(anchor);
         let targetID = parseInt(anchor.innerHTML.match(/\d+/)[0]);
+        console.log(targetID)
         let targetDiv = document.getElementById(targetID);
 
         let bounding = targetDiv.getBoundingClientRect();
@@ -107,7 +233,7 @@
           bounding.right <= (window.innerWidth || document.documentElement.clientWidth)
         ) {
           // If the element is in the viewport, change its background color to red
-          targetDiv.style.backgroundColor = "red";
+          targetDiv.style.backgroundColor = "#892523";
           colored = true;
         } else {
           console.log('u elsu')
@@ -125,8 +251,15 @@
           previewDiv.style.left = (event.clientX + 10) + 'px';
            */
           previewDiv.style.left =  anchor.offsetLeft + 50 + "px";
-          previewDiv.style.top = anchor.offsetTop +"px";
+          console.log(anchor.offsetTop + (anchor.offsetTop - scrollY + targetDiv.clientHeight - window.innerHeight))
+          if(window.innerHeight < anchor.offsetTop - scrollY + targetDiv.clientHeight){
+            previewDiv.style.top = anchor.offsetTop - (anchor.offsetTop - scrollY + targetDiv.clientHeight - window.innerHeight) +"px";
+          }
+          else{
+            previewDiv.style.top = anchor.offsetTop +"px";
+          }
           previewDiv.style.position = "absolute";
+          previewDiv.style.backgroundColor = "#3C3C3C"
 
           previewDiv.removeAttribute('id');
           document.body.appendChild(previewDiv);
@@ -143,8 +276,18 @@
       function hoverleave(anchor){
         let targetID = parseInt(anchor.innerHTML.match(/\d+/)[0]);
         let targetDiv = document.getElementById(targetID);
-        if(colored) targetDiv.style.backgroundColor = "white";
+        if(colored && targetDiv !== currentlyColored) targetDiv.style.backgroundColor = "#3C3C3C";
       }
+
+      function jump(anchor){
+        if(currentlyColored != null)
+          currentlyColored.style.backgroundColor = "#3C3C3C"
+        let targetID = parseInt(anchor.innerHTML.match(/\d+/)[0]);
+        let targetDiv = document.getElementById(targetID);
+        targetDiv.style.backgroundColor = "#892523"
+        currentlyColored = targetDiv;
+      }
+
       let repliesNumberS;
       repliesNumberS = '<%=repliesNumber%>';
       let threadID = document.getElementById('thread_id').getAttribute('data-id');
@@ -171,22 +314,24 @@
 
           specificEx = new RegExp(">>(" + tags[j] + ")", "g");
 
-
+          let test = document.getElementById('tags' + tags[j]);
+          console.log(replyBody.parentElement.id)
+          test.innerHTML = test.innerHTML + `<a onmouseover="hoverpreview(this)" onmouseleave="hoverleave(this)" onclick="jump(this)" href="#${replyBody.parentElement.id}">>>${replyBody.parentElement.id}</a>  `
 
           if(tags[j] === threadID){
-            replyText = replyText.replace(specificEx, `<a onmouseover="hoverpreview(this)" onmouseleave="hoverleave(this)" href="#$1">>>$1(OP)</a>`)
-
+            replyText = replyText.replace(specificEx, `<a onmouseover="hoverpreview(this)" onmouseleave="hoverleave(this)" onclick="jump(this)" href="#$1">>>$1(OP)</a>`)
           }
           else if(session_id === replySession){
-            replyText = replyText.replace(specificEx, '<a onmouseover="hoverpreview(this)" onmouseleave="hoverleave(this)" href="#$1">>>$1(Ti)</a>')
+            replyText = replyText.replace(specificEx, '<a onmouseover="hoverpreview(this)" onmouseleave="hoverleave(this)" onclick="jump(this)" href="#$1">>>$1(Ti)</a>')
           }
           else{
-            replyText = replyText.replace(specificEx, '<a onmouseover="hoverpreview(this)" onmouseleave="hoverleave(this)" href="#$1">>>$1</a>')
+            replyText = replyText.replace(specificEx, '<a onmouseover="hoverpreview(this)" onmouseleave="hoverleave(this)" onclick="jump(this)" href="#$1">>>$1</a>')
           }
         }
         replyBody.innerHTML = replyText;
       }
     </script>
+    <script src="/javascripts/enlargeImage.js"></script>
     <script src="/javascripts/options.js"></script>
     <script src="/javascripts/delete.js"></script>
     <script src="/javascripts/reply_form.js"></script>
