@@ -24,6 +24,10 @@ const drag = (position) => {
     let styles = floatingForm.getBoundingClientRect();
     let left = styles.left;
     let top = styles.top;
+
+    if(top < 0)
+        top = 0;
+
     floatingForm.style.setProperty('left', `${left + position.movementX}px`)
     floatingForm.style.setProperty('top', `${top + position.movementY}px`)
 };
@@ -57,7 +61,7 @@ floatingReplyBottom.addEventListener('click', ()=> {
 function formPopUp(id){
     if(open === false){
         let rect = id.getBoundingClientRect();
-        floatingForm.style.left = rect.left + 30 + "px";
+        floatingForm.style.left = rect.left + 50 + "px";
         floatingForm.style.top = rect.top + "px";
         floatingText.value = '>>' + id.getAttribute('data-id') + '\n';
         floatingForm.style.display = 'flex';
@@ -65,7 +69,7 @@ function formPopUp(id){
     }
     else{
         let rect = id.getBoundingClientRect();
-        floatingForm.style.left = rect.left + 30 + "px";
+        floatingForm.style.left = rect.left + 50 + "px";
         floatingForm.style.top = rect.top + "px";
 
         const cursorPosition = floatingText.selectionStart;

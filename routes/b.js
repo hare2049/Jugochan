@@ -43,7 +43,8 @@ router.get('/', function(req, res, next) {
           threads: result.rows,
           replies: resultreplies.rows,
           board: board,
-          pagenum: 1
+          pagenum: 1,
+          browser_cookie: req.cookies.session_id
         });
       })
     })
@@ -114,7 +115,8 @@ router.get('/thread/:id', function(req, res, next) {
           title: ('/b/ - ' + result.rows[0].thread_topic + ' ' + result.rows[0].text).substring(0, 47) + '...',
           thread: result.rows[0],
           board: board,
-          replies: replies.rows
+          replies: replies.rows,
+          browser_cookie: req.cookies.session_id
         });
       });
     });
@@ -147,6 +149,7 @@ router.post('/post', upload.single('uploaded_file'), function(req, res, next){
     split = req.body.username.split('#');
     username = split[0];
     tripcode = split[1];
+
     bcrypt.hash(tripcode, 10, function (err, hash){
       pool.connect(async (err,client,done) => {
         if(err)
@@ -154,7 +157,7 @@ router.post('/post', upload.single('uploaded_file'), function(req, res, next){
         client.query(`SELECT last_value FROM thread_number`, [], async(err, result) => {
           if(err)
             return res.send(err);
-          client.query(`INSERT INTO post(thread_topic, username, tripcode, text, image_link, board) VALUES($1,$2,$3,$4,$5,$6);`, [req.body.topic, username, hash.substring(0,10), req.body.text, req.file.filename, board], async(err) => {
+          client.query(`INSERT INTO post(thread_topic, username, tripcode, text, image_link, board) VALUES($1,$2,$3,$4,$5,$6);`, [req.body.topic, username, hash.substring(10,20), req.body.text, req.file.filename, board], async(err) => {
             done()
             if(err)
               return res.send(err);
@@ -204,6 +207,8 @@ router.post('/reply', upload.single('uploaded_file'), function(req, res, next){
       split = req.body.username.split('#');
       username = split[0];
       tripcode = split[1];
+      console.log(tripcode);
+
       bcrypt.hash(tripcode, 10, function (err, hash){
         pool.connect(async (err,client,done) => {
           if(err)
@@ -211,7 +216,7 @@ router.post('/reply', upload.single('uploaded_file'), function(req, res, next){
           client.query(`SELECT last_value FROM thread_number`, [], async(err, result) => {
             if(err)
               return res.send(err);
-            client.query(`INSERT INTO replies(username, tripcode, text, post_id, cookie) VALUES($1,$2,$3,$4,$5);`, [username, hash.substring(0, 10), req.body.text, req.body.thread_id, req.cookies.session_id], async(err) => {
+            client.query(`INSERT INTO replies(username, tripcode, text, post_id, cookie) VALUES($1,$2,$3,$4,$5);`, [username, hash.substring(10, 20), req.body.text, req.body.thread_id, req.cookies.session_id], async(err) => {
               done()
               if(err)
                 return res.send(err);
@@ -251,7 +256,7 @@ router.post('/reply', upload.single('uploaded_file'), function(req, res, next){
           client.query(`SELECT last_value FROM thread_number`, [], async(err, result) => {
             if(err)
               return res.send(err);
-            client.query(`INSERT INTO replies(username, tripcode, text, image_link, post_id, cookie) VALUES($1,$2,$3,$4,$5,$6);`, [username, hash.substring(0, 10), req.body.text, req.file.filename, req.body.thread_id, req.cookies.session_id], async(err) => {
+            client.query(`INSERT INTO replies(username, tripcode, text, image_link, post_id, cookie) VALUES($1,$2,$3,$4,$5,$6);`, [username, hash.substring(10, 20), req.body.text, req.file.filename, req.body.thread_id, req.cookies.session_id], async(err) => {
               done()
               if(err)
                 return res.send(err);
@@ -350,7 +355,8 @@ router.get('/:pagenum', function(req, res, next) {
           threads: result.rows,
           replies: resultreplies.rows,
           board: board,
-          pagenum: pagenum
+          pagenum: pagenum,
+          browser_cookie: req.cookies.session_id
         });
       })
     })

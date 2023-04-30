@@ -7,6 +7,40 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   </head>
   <body>
+
+  <%let repliesNumber = replies.length;%>
+
+  <%
+  function quoteText(text) {
+    const regexQ = /(^|[^>])>(?!>)((?:.(?!>>))+)/g;
+    let returnedText = text.replace(regexQ, '$1<span class="quote">>$2</span>');
+
+    let regex = />>(\d+)/g;
+    let matches = returnedText.match(regex)
+    if (matches === null) return returnedText;
+    let tags = matches.map(match => match.replace(/>>/g, ''));
+    let specificEx;
+
+    for(let i = 0; i < tags.length; i++){
+      specificEx = new RegExp(">>(" + tags[i] + ")", "g");
+
+      let replyObj = replies.find(reply => reply.id == tags[i]);
+      let replySession = replyObj ? replyObj.cookie : null;
+
+      if(tags[i] == thread.id){
+        returnedText = returnedText.replace(specificEx, `<a onmouseover="hoverpreview(this)" onmouseleave="hoverleave(this)" onclick="jump(this)" href="#$1">>>$1(OP)</a>`)
+      }
+      else if(browser_cookie === replySession){
+        returnedText = returnedText.replace(specificEx, '<a onmouseover="hoverpreview(this)" onmouseleave="hoverleave(this)" onclick="jump(this)" href="#$1">>>$1(Ti)</a>')
+      }
+      else{
+        returnedText = returnedText.replace(specificEx, '<a onmouseover="hoverpreview(this)" onmouseleave="hoverleave(this)" onclick="jump(this)" href="#$1">>>$1</a>')
+      }
+    }
+    return returnedText;
+  }
+  %>
+
     <div class="navbar"><span class="boardList"> / <a href="/b" class="navbar_anchor">b</a> / <a href="/lit" class="navbar_anchor">lit</a> / <a href="/his" class="navbar_anchor">his</a> / <a href="/mu" class="navbar_anchor">mu</a> / <a href="/pol" class="navbar_anchor">pol</a> / </span> <span class="navbarRight">[<a id="delete1" class="navbar_anchor">Delete</a>] [<a class="navbar_anchor optionsLink">Options</a>]</span> </div>
 
 
@@ -81,7 +115,7 @@
     <%}%>
     <div id="navLinksTop">
       [<a href="/<%=board%>">Nazad</a>]
-      [<a href="/<%=board%>/Katalog">Katalog</a>]
+      [<a href="/<%=board%>/katalog">Katalog</a>]
       [<a href="#navLinksBottom">Bottom</a>]
       <%if(thread.archived !== true){%>
       [<a href="/<%=board%>/thread/<%=thread.id%>">Update</a>]
@@ -124,12 +158,10 @@
         <span class="post_time"><%=formattedDateTime %></span>
         <a class="post_id" id="thread_id" data-id="<%=thread.id%>" onclick="formPopUp(this)">No. <%=thread.id%></a>
         <span id="tags<%=thread.id%>" class="allTags"></span>
-        <blockquote class="postMessage"><%=thread.text%></blockquote>
+        <blockquote class="postMessage"><%-quoteText(thread.text)%></blockquote>
       </div>
 
       <!-- </div>-->
-       <%let repliesNumber = replies.length;%>
-
         <% for (let i = 0; i < replies.length; i++) { %>
           <div id="<%= replies[i].id %>" class="post_div reply_div">
             <%if(replies[i].image_link != null){%>
@@ -167,18 +199,11 @@
               }) + ` (${dayOfWeek})`;
 
             %>
+
             <span class="post_time"><%=formattedDateTime %></span>
             <a class="post_id" data-id="<%=replies[i].id%>" onclick="formPopUp(this)">No. <%=replies[i].id%></a>
             <span id="tags<%=replies[i].id%>" class="allTags"></span>
-            <blockquote id="reply_text<%=i%>" class="postMessage"><%=replies[i].text%></blockquote>
-
-            <!--
-            <input type="checkbox" id="ch<%=replies[i].id%>" value="<%=replies[i].id%>" data-cookie="<%=replies[i].cookie%>">
-            <span id="reply_username<%=replies[i].id%>"><b><%=replies[i].username%></b> <%if(replies[i].tripcode != null){%><%='!' + replies[i].tripcode%><%}%></span>
-            <span id="reply_time<%=replies[i].id%>"><%=replies[i].created_at %></span>
-            <a id="reply_id<%=replies[i].id%>" data-id="<%=replies[i].id%>" onclick="formPopUp(this)"><%=replies[i].id%></a>
-            <pre id="reply_text<%=i%>"><%=replies[i].text%></pre>
-            -->
+            <blockquote id="reply_text<%=i%>" class="postMessage"><%-quoteText(replies[i].text)%></blockquote>
           </div>
         <% } %>
 
@@ -226,6 +251,8 @@
 
 
     <script>
+
+
       let colored = false;
       let currentlyColored = null;
       function hoverpreview(anchor){
@@ -306,9 +333,9 @@
         currentlyColored = targetDiv;
       }
 
+
       let repliesNumberS;
       repliesNumberS = '<%=repliesNumber%>';
-      let threadID = document.getElementById('thread_id').getAttribute('data-id');
 
       for(let i = 0; i < repliesNumberS; i++){
         let replyBody = document.getElementById('reply_text' + i);
@@ -317,35 +344,12 @@
         let matches = replyText.match(regex)
         if (matches === null) continue;
         let tags = matches.map(match => match.replace(/>>/g, ''));
-        let session_id = decodeURIComponent(document.cookie.slice('session_id='.length));
-        let replySession;
-        let specificEx;
 
 
         for(let j = 0; j < tags.length; j++){
-          if(tags[j] !== threadID){
-            if(document.getElementById('ch'+ tags[j]) == null) {
-              replySession = null
-            }
-            else replySession = document.getElementById('ch' + tags[j]).getAttribute('data-cookie');
-          }
-
-          specificEx = new RegExp(">>(" + tags[j] + ")", "g");
-
           let forTags = document.getElementById('tags' + tags[j]);
           forTags.innerHTML = forTags.innerHTML + `<a onmouseover="hoverpreview(this)" onmouseleave="hoverleave(this)" onclick="jump(this)" href="#${replyBody.parentElement.id}">>>${replyBody.parentElement.id}</a>  `
-
-          if(tags[j] === threadID){
-            replyText = replyText.replace(specificEx, `<a onmouseover="hoverpreview(this)" onmouseleave="hoverleave(this)" onclick="jump(this)" href="#$1">>>$1(OP)</a>`)
-          }
-          else if(session_id === replySession){
-            replyText = replyText.replace(specificEx, '<a onmouseover="hoverpreview(this)" onmouseleave="hoverleave(this)" onclick="jump(this)" href="#$1">>>$1(Ti)</a>')
-          }
-          else{
-            replyText = replyText.replace(specificEx, '<a onmouseover="hoverpreview(this)" onmouseleave="hoverleave(this)" onclick="jump(this)" href="#$1">>>$1</a>')
-          }
         }
-        replyBody.innerHTML = replyText;
       }
     </script>
     <script src="/javascripts/enlargeImage.js"></script>

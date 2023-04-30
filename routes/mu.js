@@ -43,7 +43,8 @@ router.get('/', function(req, res, next) {
           threads: result.rows,
           replies: resultreplies.rows,
           board: board,
-          pagenum: 1
+          pagenum: 1,
+          browser_cookie: req.cookies.session_id
         });
       })
     })
@@ -114,7 +115,8 @@ router.get('/thread/:id', function(req, res, next) {
           title: ('/mu/ - ' + result.rows[0].thread_topic + ' ' + result.rows[0].text).substring(0, 47) + '...',
           thread: result.rows[0],
           board: board,
-          replies: replies.rows
+          replies: replies.rows,
+          browser_cookie: req.cookies.session_id
         });
       });
     });
@@ -350,7 +352,8 @@ router.get('/:pagenum', function(req, res, next) {
           threads: result.rows,
           replies: resultreplies.rows,
           board: board,
-          pagenum: pagenum
+          pagenum: pagenum,
+          browser_cookie: req.cookies.session_id
         });
       })
     })
