@@ -6,8 +6,91 @@
     <link rel='stylesheet' href='/stylesheets/catalog.css' />
   </head>
   <body>
+
+  <div class="navbar"><span class="boardList"> / <a href="/b" class="navbar_anchor">b</a> / <a href="/lit" class="navbar_anchor">lit</a> / <a href="/his" class="navbar_anchor">his</a> / <a href="/mu" class="navbar_anchor">mu</a> / <a href="/pol" class="navbar_anchor">pol</a> / </span> <span class="navbarRight">[<a class="navbar_anchor optionsLink">Options</a>]</span> </div>
+  <div class="boardBanner">
+      <img alt="Jugochan" src="/images/<%=board%>_banner.jpg" class="boardBannerImage">
+      <div class="boardTitle">
+
+          <%
+          let board_title;
+          switch (board) {
+              case 'b':
+                  board_title = '/b/ - Općenito';
+                  break;
+              case 'his':
+                  board_title = '/his/ - Historija';
+                  break;
+              case 'lit':
+                  board_title = '/lit/ - Literatura';
+                  break;
+              case 'mu':
+                  board_title = '/mu/ - Muzika';
+                  break;
+              case 'pol':
+                  board_title = '/pol/ - Politika';
+                  break;
+          }%>
+          <%=board_title%>
+      </div>
+  </div>
+
+  <div id="togglePostFormLink">
+      <span id="postLinkSpan"> [ <a id="post_link">Napravi Novi Thread </a> ] </span>
+      <form id="post_form" action="/<%=board%>/post" method="post" enctype="multipart/form-data">
+          <table>
+              <tbody>
+              <tr>
+                  <td class="labels">
+                      Username
+                  </td>
+                  <td>
+                      <input name="username" id="username" type="text">
+                  </td>
+              </tr>
+              <tr>
+                  <td class="labels">
+                      Tema
+                  </td>
+                  <td>
+                      <input name="topic" id="topic" type="text">
+                      <button type="submit">Objavi</button>
+                  </td>
+              </tr>
+              <tr>
+                  <td class="labels">
+                      Tekst
+                  </td>
+                  <td style="display: flex; flex-wrap: wrap; flex-direction: column;">
+                      <textarea name="text" id="text" cols="36" rows="4" wrap="soft"></textarea>
+                      <!--<span id="textareaErrorMessage"></span>-->
+                  </td>
+              </tr>
+              <tr>
+                  <td class="labels">
+                      File
+                  </td>
+                  <td>
+                      <input name="uploaded_file" id="file" type="file">
+                  </td>
+              </tr>
+              </tbody>
+          </table>
+      </form>
+  </div>
+
+
+
+  <div id="navLinksTop">
+      [<a href="/<%=board%>">Nazad</a>]
+      [<a href="/<%=board%>/arhiva">Arhiva</a>]
+      [<a href="#navbarBottom">Bottom</a>]
+      [<a href="/<%=board%>/katalog">Update</a>]
+  </div>
+
   <!--width 180px height 320px-->
   <div id="threads">
+      <%console.log(threads.length)%>
     <% for (let i = 0; i < threads.length; i++) { %>
       <div class="thread">
         <a href="/<%=threads[i].board%>/thread/<%=threads[i].id%>"><img alt class="thumbnail" src="/images/<%=threads[i].image_link%>"></a>
@@ -16,7 +99,19 @@
       </div>
     <% } %>
   </div>
-   <a id="OptionsLink">Options</a>
-    <script src="/javascripts/options.js"></script>
+
+  <div id="navLinksBottom">
+      [<a href="/<%=board%>">Nazad</a>]
+      [<a href="/<%=board%>/arhiva">Arhiva</a>]
+      [<a href="#navLinksTop">Top</a>]
+      [<a href="/<%=board%>/thread/katalog">Update</a>]
+  </div>
+
+  <div id="navbarBottom" class="navbar"><span class="boardList"> / <a href="/b" class="navbar_anchor">b</a> / <a href="/lit" class="navbar_anchor">lit</a> / <a href="/his" class="navbar_anchor">his</a> / <a href="/mu" class="navbar_anchor">mu</a> / <a href="/pol" class="navbar_anchor">pol</a> / </span> <span class="navbarRight">[<a class="navbar_anchor optionsLink">Options</a>]</span> </div>
+
+  <script src="/javascripts/options.js"></script>
+  <script src="/javascripts/post_form.js"></script>
+  <script src="/javascripts/security_form_check.js"></script>
+
   </body>
 </html>

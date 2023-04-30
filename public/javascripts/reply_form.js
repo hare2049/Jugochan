@@ -1,6 +1,4 @@
-// Hide the reply form initially
-document.getElementById("reply_form").style.display = "none";
-
+// Hide the reply form initiall
 // Handle the click event on the "Post a reply" link
 
 document.getElementById("reply_link").addEventListener("click", function(e) {

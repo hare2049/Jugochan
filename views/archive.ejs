@@ -6,17 +6,53 @@
     <link rel='stylesheet' href='/stylesheets/archive.css' />
   </head>
   <body>
-    archive
-  <div id="threads">
-    <% for (let i = 0; i < threads.length; i++) { %>
-    <div id="thread<%=threads[i].id%>" class="thread">
-      <span><%=threads[i].thread_topic%> ' ' <%=threads[i].text%></span>
+    <div class="navbar"><span class="boardList"> / <a href="/b" class="navbar_anchor">b</a> / <a href="/lit" class="navbar_anchor">lit</a> / <a href="/his" class="navbar_anchor">his</a> / <a href="/mu" class="navbar_anchor">mu</a> / <a href="/pol" class="navbar_anchor">pol</a> / </span> <span class="navbarRight">[<a class="navbar_anchor optionsLink">Options</a>]</span> </div>
+    <div class="boardBanner">
+      <img alt="Jugochan" src="/images/<%=board%>_banner.jpg" class="boardBannerImage">
+      <div class="boardTitle">
+
+        <%
+        let board_title;
+        switch (board) {
+          case 'b':
+            board_title = '/b/ - Općenito';
+            break;
+          case 'his':
+            board_title = '/his/ - Historija';
+            break;
+          case 'lit':
+            board_title = '/lit/ - Literatura';
+            break;
+          case 'mu':
+            board_title = '/mu/ - Muzika';
+            break;
+          case 'pol':
+            board_title = '/pol/ - Politika';
+            break;
+        }%>
+        <%=board_title%>
+      </div>
     </div>
-    <%}%>
-  </div>
 
-  <a id="delete">Delete</a>
+    <table id="arc-list">
+      <thead>
+        <tr>
+          <td>Broj</td>
+          <td>Izvod</td>
+          <td></td>
+        </tr>
+      </thead>
+        <tbody>
+        <% for (let i = 0; i < threads.length; i++) { %>
+          <tr>
+            <td><%=threads[i].id%></td>
+            <td class="rowd"><%=(threads[i].thread_topic + ' ' + threads[i].text).substring(0,100) + ((threads[i].thread_topic + threads[i].text).length > 100 ? "..." : "")%></td>
+            <td>[<a href="/<%=board%>/thread/<%=threads[i].id%>">Otvori</a>]</td>
+          </tr>
+        <%}%>
+        </tbody>
+    </table>
 
-
+    <div class="navbar bottomNavbar"><span class="boardList"> / <a href="/b" class="navbar_anchor">b</a> / <a href="/lit" class="navbar_anchor">lit</a> / <a href="/his" class="navbar_anchor">his</a> / <a href="/mu" class="navbar_anchor">mu</a> / <a href="/pol" class="navbar_anchor">pol</a> / </span> <span class="navbarRight">[<a class="navbar_anchor optionsLink">Options</a>]</span> </div>
   </body>
 </html>

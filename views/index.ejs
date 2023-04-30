@@ -6,13 +6,39 @@
     <link rel='stylesheet' href='/stylesheets/index.css' />
   </head>
   <body>
-    <a href="/b">b</a>
-    <a href="/his">his</a>
-    <a href="/lit">lit</a>
-    <a href="/mu">mu</a>
-    <a href="/pol">pol</a>
-    <a id="OptionsLink">Options</a>
+  <div class="navbar"><span class="boardList"> / <a href="/b" class="navbar_anchor">b</a> / <a href="/lit" class="navbar_anchor">lit</a> / <a href="/his" class="navbar_anchor">his</a> / <a href="/mu" class="navbar_anchor">mu</a> / <a href="/pol" class="navbar_anchor">pol</a> / </span> <span class="navbarRight">[<a class="navbar_anchor optionsLink">Options</a>]</span> </div>
+  <div class="boardBanner">
+    <img alt="Jugochan" src="/images/JugochanBanner.png" class="JugochanBanner">
+  </div>
 
-    <script src="/javascripts/options.js"></script>
+  <div class="landing">
+    <div class="description">
+      <h1>Jugochan</h1>
+      <p>Jugochan je imageboard za ex-yu prostore i sve one koji pričaju i razumiju ovaj jezik.</p>
+      <span>U raspolaganju trenutno serviramo ove boardove:</span>
+      <span class="boards">
+        [<a href="/b">/b/ - Općenito</a>]
+        [<a href="/lit">/lit/ - Literatura</a>]
+        [<a href="/his">/his/ - Historija</a>]
+        [<a href="/mu">/mu/ - Muzika</a>]
+        [<a href="/pol">/pol/ - Politika</a>]
+      </span>
+      <div class="newThreads">
+        <span>Aktivni ili novi threadovi:</span>
+        <div id="threads">
+          <%for(let i = 0; i < threads.length; i++){%>
+            <div class="thread">
+              <a class="onBoard" href="/<%=threads[i].board%>">/<%=threads[i].board%>/</a>
+              <a href="/<%=threads[i].board%>/thread/<%=threads[i].id%>"><img alt class="thumbnail" src="/images/<%=threads[i].image_link%>"></a>
+              <div class="teaser"><b><%=threads[i].thread_topic%> </b><%=threads[i].text%></div>
+            </div>
+          <%}%>
+        </div>
+        </div>
+    </div>
+  </div>
+
+  <div class="navbar bottomNavbar"><span class="boardList"> / <a href="/b" class="navbar_anchor">b</a> / <a href="/lit" class="navbar_anchor">lit</a> / <a href="/his" class="navbar_anchor">his</a> / <a href="/mu" class="navbar_anchor">mu</a> / <a href="/pol" class="navbar_anchor">pol</a> / </span> <span class="navbarRight">[<a class="navbar_anchor optionsLink">Options</a>]</span> </div>
+  <script src="/javascripts/options.js"></script>
   </body>
 </html>

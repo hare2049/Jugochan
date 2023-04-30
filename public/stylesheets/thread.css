@@ -1,12 +1,7 @@
 @import "common.css";
 
-.labels{
-  font-weight: 700;
-  width: 100px;
-  border: 1px solid white;
-  background-color: #1618a9;
-  padding: 0 5px;
-  font-size: 10pt;
+#reply_form{
+  display: none;
 }
 
 #floating_reply_form {
@@ -44,41 +39,6 @@
 
 #username{
   width: 244px;
-}
-
-.navbar{
-  display: flex;
-}
-
-.navbar a{
-  text-decoration: none;
-}
-
-.boardList{
-  display: flex;
-  width: 80%;
-  justify-content: center;
-}
-.navbarRight{
-  display: flex;
-  width: 20%;
-  justify-content: center;
-}
-.navbar_anchor{
-  cursor: pointer;
-  margin-right: 2%;
-  margin-left: 2%;
-}
-
-#togglePostFormLink{
-  display: flex;
-  justify-content: center;
-  margin-top: 20px;
-  margin-bottom: 20px;
-}
-
-#reply_link{
-  cursor: pointer;
 }
 
 
@@ -131,6 +91,24 @@
   border-radius: 5px;
 }
 
+#thread_subject{
+  color: #f30400;
+  font-weight: bolder;
+  font-size: larger;
+}
+
+.post_id{
+  color: #dadada;
+}
+.post_id:hover{
+  color: #f30400;
+}
+.threadImage{
+  max-height: 250px;
+  max-width: 250px;
+}
+
+
 #thread{
   display: flex;
   flex-direction: column;
@@ -140,51 +118,9 @@
   padding-bottom: 10px;
 }
 
-#bottom{
-  display: flex;
-  justify-content: center;
-  margin-bottom: 20px;
-}
-
-#thread_subject{
-  color: #f30400;
-  font-weight: bolder;
-  font-size: larger;
-}
-
-.boardBanner{
-  margin-top: 20px;
+.arhiviranHeader{
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
-}
-
-.boardBannerImage{
-  border: 1px solid white;
-  width: 300px;
-  height: 100px;
-
-}
-
-.post_id{
-  color: #dadada;
-}
-.post_id:hover{
   color: #f30400;
-}
-#threadImage{
-  max-height: 250px;
-  max-width: 250px;
-}
-
-#navLinksTop{
-  margin-top: 20px;
-}
-#navLinksTop a{
-  text-decoration: none;
-}
-
-#navLinksBottom a{
-  text-decoration: none;
 }

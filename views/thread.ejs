@@ -7,8 +7,7 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   </head>
   <body>
-
-    <div class="navbar"><span class="boardList"> / <a href="/b" class="navbar_anchor">b</a> / <a href="/lit" class="navbar_anchor">lit</a> / <a href="/tv" class="navbar_anchor">tv</a> / <a href="/mu" class="navbar_anchor">mu</a> / <a href="/pol" class="navbar_anchor">pol</a> / </span> <span class="navbarRight">[<a id="delete1" class="navbar_anchor">Delete</a>] [<a class="navbar_anchor optionsLink">Options</a>]</span> </div>
+    <div class="navbar"><span class="boardList"> / <a href="/b" class="navbar_anchor">b</a> / <a href="/lit" class="navbar_anchor">lit</a> / <a href="/his" class="navbar_anchor">his</a> / <a href="/mu" class="navbar_anchor">mu</a> / <a href="/pol" class="navbar_anchor">pol</a> / </span> <span class="navbarRight">[<a id="delete1" class="navbar_anchor">Delete</a>] [<a class="navbar_anchor optionsLink">Options</a>]</span> </div>
 
 
     <div class="boardBanner">
@@ -38,47 +37,55 @@
       </div>
     </div>
 
+    <%if(thread.archived !== true){%>
       <div id="togglePostFormLink">
-        <span id="replyLinkSpan"> [ <a id="reply_link">Odgovori</a> ] </span>
-        <form id="reply_form" action="/b/reply" method="post" enctype="multipart/form-data">
-          <input name="thread_id" type="hidden" value="<%=thread.id%>">
-          <table>
-            <tbody>
-            <tr>
-              <td class="labels">
-                Username
-              </td>
-              <td>
-                <input id="username" name="username" type="text">
-                <button type="submit">Objavi</button>
-              </td>
-            </tr>
-            <tr>
-              <td class="labels">
-                Tekst
-              </td>
-              <td style="display: flex; flex-wrap: wrap; flex-direction: column;">
-                <textarea name="text" id="text" cols="36" rows="4" wrap="soft"></textarea>
-              </td>
-            </tr>
-            <tr>
-              <td class="labels">
-                File
-              </td>
-              <td>
-                <input name="uploaded_file" id="file" type="file">
-              </td>
-            </tr>
-            </tbody>
-          </table>
-        </form>
-      </div>
-
+          <span id="replyLinkSpan"> [ <a id="reply_link">Odgovori</a> ] </span>
+          <form id="reply_form" action="/<%=board%>/reply" method="post" enctype="multipart/form-data">
+            <input name="thread_id" type="hidden" value="<%=thread.id%>">
+            <table>
+              <tbody>
+              <tr>
+                <td class="labels">
+                  Username
+                </td>
+                <td>
+                  <input id="username" name="username" type="text">
+                  <button type="submit">Objavi</button>
+                </td>
+              </tr>
+              <tr>
+                <td class="labels">
+                  Tekst
+                </td>
+                <td style="display: flex; flex-wrap: wrap; flex-direction: column;">
+                  <textarea name="text" id="text" cols="36" rows="4" wrap="soft"></textarea>
+                </td>
+              </tr>
+              <tr>
+                <td class="labels">
+                  File
+                </td>
+                <td>
+                  <input name="uploaded_file" id="file" type="file">
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </form>
+        </div>
+    <%}else{%>
+      <h1 class="arhiviranHeader">
+        <span>Thread je arhiviran.</span>
+        <span>Ne možeš da daješ komentare.</span>
+      </h1>
+    <%}%>
     <div id="navLinksTop">
       [<a href="/<%=board%>">Nazad</a>]
       [<a href="/<%=board%>/Katalog">Katalog</a>]
-      [<a href="#bottom">Bottom</a>]
+      [<a href="#navLinksBottom">Bottom</a>]
+      <%if(thread.archived !== true){%>
       [<a href="/<%=board%>/thread/<%=thread.id%>">Update</a>]
+      <%}%>
     </div>
 
     <div id="thread">
@@ -90,13 +97,12 @@
             File:  <a href="/image/<%=thread.image_link%>" target="_blank"><%=thread.image_link%></a>
           </div>
           <a href="/image/<%=thread.image_link%>" target ="_blank" onclick="return handleClick(event)">
-            <img alt id="threadImage" onclick="toggleImageSize(this)" class="imageBeforeClick" src="/images/<%=thread.image_link%>">
+            <img alt onclick="toggleImageSize(this)" class="imageBeforeClick threadImage" src="/images/<%=thread.image_link%>">
           </a>
         </div>
-        <div class="postInfo"></div>
           <input type="checkbox" id="ch<%=thread.id%>" value="t-<%=thread.id%>">
         <span id="thread_subject"><%=thread.thread_topic %> </span>
-        <span id="thread_username" class="post_username"><b><%=thread.username%></b> <%if(thread.tripcode != null){%><%='!' + thread.tripcode%><%}%></span>
+        <span class="post_username"><b><%=thread.username%></b> <%if(thread.tripcode != null){%><%='!' + thread.tripcode%><%}%></span>
         <%
         // Convert the string into a JavaScript Date object
         let dateObj = new Date(thread.created_at);
@@ -115,7 +121,7 @@
         }) + ` (${dayOfWeek})`;
 
         %>
-        <span id="thread_time" class="post_time"><%=formattedDateTime %></span>
+        <span class="post_time"><%=formattedDateTime %></span>
         <a class="post_id" id="thread_id" data-id="<%=thread.id%>" onclick="formPopUp(this)">No. <%=thread.id%></a>
         <span id="tags<%=thread.id%>" class="allTags"></span>
         <blockquote class="postMessage"><%=thread.text%></blockquote>
@@ -136,13 +142,13 @@
               </a>
             </div>
             <%}%>
-            <div class="postInfo"></div>
             <input type="checkbox" id="ch<%=replies[i].id%>" value="<%=replies[i].id%>" data-cookie="<%=replies[i].cookie%>">
             <%if(replies[i].username){%>
             <span id="reply_username<%=replies[i].id%>" class="post_username"><b><%=replies[i].username%></b> <%if(replies[i].tripcode != null){%><%='!' + replies[i].tripcode%><%}%></span>
             <%}else{%>
             <span id="reply_username<%=replies[i].id%>" class="post_username"><b>Anoniman</b> <%if(replies[i].tripcode != null){%><%='!' + replies[i].tripcode%><%}%></span>
             <%}%>
+
             <%
               // Convert the string into a JavaScript Date object
               let dateObj = new Date(replies[i].created_at);
@@ -162,7 +168,7 @@
 
             %>
             <span class="post_time"><%=formattedDateTime %></span>
-            <a class="post_id" id="thread_id" data-id="<%=replies[i].id%>" onclick="formPopUp(this)">No. <%=replies[i].id%></a>
+            <a class="post_id" data-id="<%=replies[i].id%>" onclick="formPopUp(this)">No. <%=replies[i].id%></a>
             <span id="tags<%=replies[i].id%>" class="allTags"></span>
             <blockquote id="reply_text<%=i%>" class="postMessage"><%=replies[i].text%></blockquote>
 
@@ -177,40 +183,45 @@
         <% } %>
 
     </div>
+
     <div id="navLinksBottom">
       [<a href="/<%=board%>">Nazad</a>]
-      [<a href="/<%=board%>/Katalog">Katalog</a>]
+      [<a href="/<%=board%>/katalog">Katalog</a>]
       [<a href="#navLinksTop">Top</a>]
+      <%if(thread.archived !== true){%>
       [<a href="/<%=board%>/thread/<%=thread.id%>">Update</a>]
+      <%}%>
     </div>
-    <form id="floating_reply_form" class="draggable" action="/b/reply" method="post" enctype="multipart/form-data">
-      <div id="draggable_header">Odgovori <img id="draggable_header_x" style="float: right" alt="X" src="/images/cross.png"></div>
-      <input name="thread_id" type="hidden" value="<%=thread.id%>">
-      <table>
-        <tbody>
-          <tr>
-            <td>
-              <input name="username" id="floating_username" type="text" placeholder="Username">
-            </td>
-          </tr>
-          <tr>
-            <td style="display: flex; flex-wrap: wrap; flex-direction: column;">
-              <textarea name="text" id="floating_text" cols="36" rows="4" wrap="soft" placeholder="Tekst"></textarea>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <div>
-        <input name="uploaded_file" id="file" type="file" style="width: 180px">
-        <button id="floating_submit" type="submit" style="width: 75px; height: 21px; float: right">Objavi</button>
-      </div>
-    </form>
 
+    <%if(thread.archived !== true){%>
+      <form id="floating_reply_form" class="draggable" action="/<%=board%>/reply" method="post" enctype="multipart/form-data">
+        <div id="draggable_header">Odgovori <img id="draggable_header_x" style="float: right" alt="X" src="/images/cross.png"></div>
+        <input name="thread_id" type="hidden" value="<%=thread.id%>">
+        <table>
+          <tbody>
+            <tr>
+              <td>
+                <input name="username" id="floating_username" type="text" placeholder="Username">
+              </td>
+            </tr>
+            <tr>
+              <td style="display: flex; flex-wrap: wrap; flex-direction: column;">
+                <textarea name="text" id="floating_text" cols="36" rows="4" wrap="soft" placeholder="Tekst"></textarea>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div>
+          <input name="uploaded_file" id="file" type="file" style="width: 180px">
+          <button id="floating_submit" type="submit" style="width: 75px; height: 21px; float: right">Objavi</button>
+        </div>
+      </form>
     <div id="bottom">
       <span id="replyLinkSpanBottom"> [ <a id="floating_reply_bottom">Odgovori</a> ] </span>
     </div>
+    <%}%>
 
-    <div class="navbar"><span class="boardList"> / <a href="/b" class="navbar_anchor">b</a> / <a href="/lit" class="navbar_anchor">lit</a> / <a href="/tv" class="navbar_anchor">tv</a> / <a href="/mu" class="navbar_anchor">mu</a> / <a href="/pol" class="navbar_anchor">pol</a> / </span> <span class="navbarRight">[<a id="delete2" class="navbar_anchor">Delete</a>] [<a class="navbar_anchor optionsLink">Options</a>]</span> </div>
+    <div class="navbar"><span class="boardList"> / <a href="/b" class="navbar_anchor">b</a> / <a href="/lit" class="navbar_anchor">lit</a> / <a href="/his" class="navbar_anchor">his</a> / <a href="/mu" class="navbar_anchor">mu</a> / <a href="/pol" class="navbar_anchor">pol</a> / </span> <span class="navbarRight">[<a id="delete2" class="navbar_anchor">Delete</a>] [<a class="navbar_anchor optionsLink">Options</a>]</span> </div>
 
 
 
@@ -218,9 +229,7 @@
       let colored = false;
       let currentlyColored = null;
       function hoverpreview(anchor){
-        console.log(anchor);
         let targetID = parseInt(anchor.innerHTML.match(/\d+/)[0]);
-        console.log(targetID)
         let targetDiv = document.getElementById(targetID);
 
         let bounding = targetDiv.getBoundingClientRect();
@@ -236,11 +245,7 @@
           targetDiv.style.backgroundColor = "#892523";
           colored = true;
         } else {
-          console.log('u elsu')
           colored = false;
-
-          console.log(anchor.offsetLeft);
-          console.log(anchor.offsetTop);
 
           let previewDiv = targetDiv.cloneNode(true);
                   //document.createElement('div');
@@ -251,7 +256,7 @@
           previewDiv.style.left = (event.clientX + 10) + 'px';
            */
           previewDiv.style.left =  anchor.offsetLeft + 50 + "px";
-          console.log(anchor.offsetTop + (anchor.offsetTop - scrollY + targetDiv.clientHeight - window.innerHeight))
+
           if(window.innerHeight < anchor.offsetTop - scrollY + targetDiv.clientHeight){
             previewDiv.style.top = anchor.offsetTop - (anchor.offsetTop - scrollY + targetDiv.clientHeight - window.innerHeight) +"px";
           }
@@ -276,12 +281,25 @@
       function hoverleave(anchor){
         let targetID = parseInt(anchor.innerHTML.match(/\d+/)[0]);
         let targetDiv = document.getElementById(targetID);
-        if(colored && targetDiv !== currentlyColored) targetDiv.style.backgroundColor = "#3C3C3C";
+        if(colored && targetDiv !== currentlyColored) {
+          if(targetDiv.className.includes("opThread")){
+            targetDiv.style.backgroundColor = "";
+          }
+          else{
+            targetDiv.style.backgroundColor = "#3C3C3C";
+          }
+        }
       }
 
       function jump(anchor){
-        if(currentlyColored != null)
-          currentlyColored.style.backgroundColor = "#3C3C3C"
+        if(currentlyColored != null){
+          if(currentlyColored.className.includes("opThread")){
+            currentlyColored.style.backgroundColor = "";
+          }
+          else{
+            currentlyColored.style.backgroundColor = "#3C3C3C";
+          }
+        }
         let targetID = parseInt(anchor.innerHTML.match(/\d+/)[0]);
         let targetDiv = document.getElementById(targetID);
         targetDiv.style.backgroundColor = "#892523"
@@ -314,9 +332,8 @@
 
           specificEx = new RegExp(">>(" + tags[j] + ")", "g");
 
-          let test = document.getElementById('tags' + tags[j]);
-          console.log(replyBody.parentElement.id)
-          test.innerHTML = test.innerHTML + `<a onmouseover="hoverpreview(this)" onmouseleave="hoverleave(this)" onclick="jump(this)" href="#${replyBody.parentElement.id}">>>${replyBody.parentElement.id}</a>  `
+          let forTags = document.getElementById('tags' + tags[j]);
+          forTags.innerHTML = forTags.innerHTML + `<a onmouseover="hoverpreview(this)" onmouseleave="hoverleave(this)" onclick="jump(this)" href="#${replyBody.parentElement.id}">>>${replyBody.parentElement.id}</a>  `
 
           if(tags[j] === threadID){
             replyText = replyText.replace(specificEx, `<a onmouseover="hoverpreview(this)" onmouseleave="hoverleave(this)" onclick="jump(this)" href="#$1">>>$1(OP)</a>`)

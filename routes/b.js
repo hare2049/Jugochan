@@ -61,6 +61,7 @@ router.get('/katalog', function(req, res, next) {
               WHERE post.board = $1 
               GROUP BY post.id 
               ORDER BY most_recent_reply DESC
+              LIMIT 200
       `, [board], async (err, result) => {
       done()
       console.log(result.rows)
@@ -68,6 +69,7 @@ router.get('/katalog', function(req, res, next) {
       console.log(result);
       res.render('catalog', {
         title: '/b/ - Općenito - Katalog - Jugochan' ,
+        board: board,
         threads: result.rows
       });
     })
@@ -101,6 +103,9 @@ router.get('/thread/:id', function(req, res, next) {
       if(err) return res.send(err)
       if(result.rows.length === 0)
         return res.send("Thread does not exist")
+      if(result.rows[0].board !== board) {
+        return res.send("Board and thread do not match")
+      }
       client.query(`SELECT * FROM replies WHERE post_id = $1`, [req.params.id], async(err, replies) => {
         done()
         if (err)
