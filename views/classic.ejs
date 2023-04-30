@@ -8,59 +8,11 @@
   </head>
   <body>
   <%const mapForTags = new Map();%>
-  <%
-  function quoteText(text, threadid, comingFromID) {
-    const regexQ = /(^|[^>])>(?!>)((?:.(?!>>))+)/g;
-    let returnedText = text.replace(regexQ, '$1<span class="quote">>$2</span>');
-
-    let regex = />>(\d+)/g;
-    let matches = returnedText.match(regex)
-    if (matches === null) return returnedText;
-    let tags = matches.map(match => match.replace(/>>/g, ''));
-    let specificEx;
-
-    for(let i = 0; i < tags.length; i++){
-      specificEx = new RegExp(">>(" + tags[i] + ")", "g");
-
-      if(mapForTags.get(tags[i]) === undefined){
-        mapForTags.set(tags[i], [comingFromID]);
-      }
-      else{
-        let array = mapForTags.get(tags[i]);
-        if(array.includes(comingFromID) === false){
-          array.push(comingFromID);
-          mapForTags.set(tags[i], array);
-        }
-      }
-
-
-      let replyObj = replies.find(reply => reply.id == tags[i]);
-      let replySession = replyObj ? replyObj.cookie : null;
-
-      if(tags[i] == threadid){
-        returnedText = returnedText.replace(specificEx, `<a onmouseover="hoverpreview(this)" onmouseleave="hoverleave(this)" onclick="jump(this)" href="#$1">>>$1(OP)</a>`)
-      }
-      else if(browser_cookie === replySession){
-        returnedText = returnedText.replace(specificEx, '<a onmouseover="hoverpreview(this)" onmouseleave="hoverleave(this)" onclick="jump(this)" href="#$1">>>$1(Ti)</a>')
-      }
-      else{
-        returnedText = returnedText.replace(specificEx, '<a onmouseover="hoverpreview(this)" onmouseleave="hoverleave(this)" onclick="jump(this)" href="#$1">>>$1</a>')
-      }
-    }
-    return returnedText;
-  }
-
-  /*stao sam ovde, ovo treba vratiti tagove na svaki post tj youove. Ne radi zbog nekoga razloga i ne console loga nista*/
-
-  %>
-
-
 
   <div class="navbar"><span class="boardList"> / <a href="/b" class="navbar_anchor">b</a> / <a href="/lit" class="navbar_anchor">lit</a> / <a href="/his" class="navbar_anchor">his</a> / <a href="/mu" class="navbar_anchor">mu</a> / <a href="/pol" class="navbar_anchor">pol</a> / </span> <span class="navbarRight">[<a id="delete1" class="navbar_anchor">Delete</a>] [<a class="navbar_anchor optionsLink">Options</a>]</span> </div>
     <div class="boardBanner">
       <img alt="Jugochan" src="/images/<%=board%>_banner.jpg" class="boardBannerImage">
       <div class="boardTitle">
-
         <%
         let board_title;
         switch (board) {
@@ -112,7 +64,6 @@
             </td>
             <td style="display: flex; flex-wrap: wrap; flex-direction: column;">
               <textarea name="text" id="text" cols="36" rows="4" wrap="soft"></textarea>
-              <!--<span id="textareaErrorMessage"></span>-->
             </td>
           </tr>
           <tr>
@@ -128,8 +79,6 @@
       </form>
     </div>
 
-
-
     <div id="navLinksTop">
       [<a href="/<%=board%>/katalog">Katalog</a>]
       [<a href="/<%=board%>/arhiva">Arhiva</a>]
@@ -138,12 +87,9 @@
     </div>
 
     <div id="threads">
-
       <%let repliesNumber = replies.length;%>
       <%let RepliesToIds = new Map();%>
-
       <% for (let i = 0; i < threads.length; i++) { %>
-      <!--Bilo je id="thread(ovaj kod sa [i])! Pazi!-->
       <div id="thread<%=threads[i].id%>" class="opThread post_div thread" data-expanded="false">
         <div id="<%=threads[i].id%>" class="opThread">
 
@@ -155,18 +101,12 @@
               <img onclick="toggleImageSize(this)" class="threadImage imageBeforeClick" src="/images/<%=threads[i].image_link%>">
             </a>
           </div>
-
           <input type="checkbox" id="ch<%=threads[i].id%>" value="t-<%=threads[i].id%>">
           <span class="thread_subject"><%=threads[i].thread_topic %> </span>
           <span class="post_username"><b><%=threads[i].username%></b> <%if(threads[i].tripcode != null){%><%='!' + threads[i].tripcode%><%}%></span>
           <%
-            // Convert the string into a JavaScript Date object
             let dateObj = new Date(threads[i].created_at);
-
-            // Get the day of the week (e.g. "Sunday", "Monday", etc.) as a string
             let dayOfWeek = dateObj.toLocaleString("en-US", { weekday: "long" });
-
-            // Format the date and time string as "YYYY-MM-DD (Day of the week) HH:MM:SS"
             let formattedDateTime = dateObj.toLocaleString("en-US", {
               year: "numeric",
               month: "2-digit",
@@ -178,17 +118,15 @@
           %>
           <span class="post_time"><%=formattedDateTime %></span>
           <a class="post_id" data-id="<%=threads[i].id%>" href="/<%=threads[i].board%>/thread/<%=threads[i].id%>">No. <%=threads[i].id%></a>
-
           <span id="tags<%=threads[i].id%>" class="allTags"></span>
-
           <blockquote class="postMessage"><%-quoteText(threads[i].text, threads[i].id, threads[i].id)%></blockquote>
-
         </div>
         <%let matchingReplies = replies.filter(reply => reply.post_id === threads[i].id);%>
         <%if(matchingReplies.length > 5) {%>
           <span id="omit<%=threads[i].id%>" class="spanForOmitting"><%=matchingReplies.length-5%> Odgovora Sakriveno</span>
           <a class="expand" onclick="showReplies(this)">[Prikaži Sve Threadove]</a>
         <%}%>
+
         <div class="thread_replies_minus_five">
           <%
             let num_of_last_replies;
@@ -213,24 +151,17 @@
                 break
             }
           %>
-
           <%for (let j = 0; j < matchingReplies.length-num_of_last_replies; j++) {%>
-
-
             <div id="<%= matchingReplies[j].id %>" class="thread_reply post_div reply_div" data-hidden="true">
-
               <%if(matchingReplies[j].image_link != null){%>
-
               <div class="file">
                 <div class="fileText">
                   File:  <a href="/image/<%=matchingReplies[j].image_link%>" target="_blank"><%=matchingReplies[j].image_link%></a>
                 </div>
                 <a href="/image/<%=matchingReplies[j].image_link%>" target ="_blank" onclick="return handleClick(event)">
                   <img alt onclick="toggleImageSize(this)" class="imageBeforeClick" src="/images/<%=matchingReplies[j].image_link%>">
-
                 </a>
               </div>
-
               <%}%>
                 <input type="checkbox" id="ch<%=matchingReplies[j].id%>" value="<%=matchingReplies[j].id%>" data-cookie="<%=matchingReplies[j].cookie%>">
               <%if(matchingReplies[j].username){%>
@@ -238,15 +169,9 @@
               <%}else{%>
                 <span id="reply_username<%=matchingReplies[j].id%>" class="post_username"><b>Anoniman</b> <%if(matchingReplies[j].tripcode != null){%><%='!' + matchingReplies[j].tripcode%><%}%></span>
               <%}%>
-
               <%
-                // Convert the string into a JavaScript Date object
                 let dateObj = new Date(matchingReplies[j].created_at);
-
-                // Get the day of the week (e.g. "Sunday", "Monday", etc.) as a string
                 let dayOfWeek = dateObj.toLocaleString("en-US", { weekday: "long" });
-
-                // Format the date and time string as "YYYY-MM-DD (Day of the week) HH:MM:SS"
                 let formattedDateTime = dateObj.toLocaleString("en-US", {
                   year: "numeric",
                   month: "2-digit",
@@ -255,28 +180,19 @@
                   minute: "2-digit",
                   second: "2-digit"
                 }) + ` (${dayOfWeek})`;
-
               %>
               <span class="post_time"><%=formattedDateTime %></span>
               <a class="post_id" data-id="<%=matchingReplies[j].id%>" href="/<%=threads[i].board%>/thread/<%=threads[i].id%>">No. <%=matchingReplies[j].id%></a>
-
               <span id="tags<%=matchingReplies[j].id%>" class="allTags"></span>
-
               <blockquote id="reply_text<%=i%>" class="postMessage"><%-quoteText(matchingReplies[j].text, threads[i].id, matchingReplies[j].id)%></blockquote>
-
-              <%RepliesToIds.set(matchingReplies[j].id,threads[i].id)%>
-
             </div>
           <%}%>
         </div>
 
         <div class="last_five">
-
           <%for (let j = matchingReplies.length-num_of_last_replies; j < matchingReplies.length; j++) {%>
           <div id="<%= matchingReplies[j].id %>" class="thread_reply post_div reply_div">
-
             <%if(matchingReplies[j].image_link != null){%>
-
             <div class="file">
               <div class="fileText">
                 File:  <a href="/image/<%=matchingReplies[j].image_link%>" target="_blank"><%=matchingReplies[j].image_link%></a>
@@ -285,7 +201,6 @@
                 <img alt onclick="toggleImageSize(this)" class="imageBeforeClick" src="/images/<%=matchingReplies[j].image_link%>">
               </a>
             </div>
-
             <%}%>
             <input type="checkbox" id="ch<%=matchingReplies[j].id%>" value="<%=matchingReplies[j].id%>" data-cookie="<%=matchingReplies[j].cookie%>">
             <%if(matchingReplies[j].username){%>
@@ -293,15 +208,9 @@
             <%}else{%>
             <span id="reply_username<%=matchingReplies[j].id%>" class="post_username"><b>Anoniman</b> <%if(matchingReplies[j].tripcode != null){%><%='!' + matchingReplies[j].tripcode%><%}%></span>
             <%}%>
-
             <%
-              // Convert the string into a JavaScript Date object
               let dateObj = new Date(matchingReplies[j].created_at);
-
-              // Get the day of the week (e.g. "Sunday", "Monday", etc.) as a string
               let dayOfWeek = dateObj.toLocaleString("en-US", { weekday: "long" });
-
-              // Format the date and time string as "YYYY-MM-DD (Day of the week) HH:MM:SS"
               let formattedDateTime = dateObj.toLocaleString("en-US", {
                 year: "numeric",
                 month: "2-digit",
@@ -310,26 +219,15 @@
                 minute: "2-digit",
                 second: "2-digit"
               }) + ` (${dayOfWeek})`;
-
             %>
-
-
             <span class="post_time"><%=formattedDateTime %></span>
             <a class="post_id" data-id="<%=matchingReplies[j].id%>" href="/<%=threads[i].board%>/thread/<%=threads[i].id%>">No. <%=matchingReplies[j].id%></a>
-
             <span id="tags<%=matchingReplies[j].id%>" class="allTags"></span>
-
             <blockquote id="reply_text<%=i%>" class="postMessage"><%-quoteText(matchingReplies[j].text, threads[i].id, matchingReplies[j].id)%></blockquote>
-
-            <%RepliesToIds.set(matchingReplies[j].id,threads[i].id)%>
-
           </div>
           <%}%>
         </div>
       </div>
-
-      <%RepliesToIds.set(threads[i].id,threads[i].id)%>
-
       <% } %>
     </div>
 
@@ -360,26 +258,55 @@
 
     <div class="navbar"><span class="boardList"> / <a href="/b" class="navbar_anchor">b</a> / <a href="/lit" class="navbar_anchor">lit</a> / <a href="/his" class="navbar_anchor">his</a> / <a href="/mu" class="navbar_anchor">mu</a> / <a href="/pol" class="navbar_anchor">pol</a> / </span> <span class="navbarRight">[<a id="delete2" class="navbar_anchor">Delete</a>] [<a class="navbar_anchor optionsLink">Options</a>]</span> </div>
 
+  <%
+  function quoteText(text, threadid, comingFromID) {
+    const regexQ = /(^|[^>])>(?!>)((?:.(?!>>))+)/g;
+    let returnedText = text.replace(regexQ, '$1<span class="quote">>$2</span>');
+    let regex = />>(\d+)/g;
+    let matches = returnedText.match(regex)
+    if (matches === null) return returnedText;
+    let tags = matches.map(match => match.replace(/>>/g, ''));
+    let specificEx;
+    for(let i = 0; i < tags.length; i++){
+      specificEx = new RegExp(">>(" + tags[i] + ")", "g");
 
-    <script>
+      if(mapForTags.get(tags[i]) === undefined){
+        mapForTags.set(tags[i], [comingFromID]);
+      }
+      else{
+        let array = mapForTags.get(tags[i]);
+        if(array.includes(comingFromID) === false){
+          array.push(comingFromID);
+          mapForTags.set(tags[i], array);
+        }
+      }
+      let replyObj = replies.find(reply => reply.id == tags[i]);
+      let replySession = replyObj ? replyObj.cookie : null;
+      if(tags[i] == threadid){
+        returnedText = returnedText.replace(specificEx, `<a onmouseover="hoverpreview(this)" onmouseleave="hoverleave(this)" onclick="jump(this)" href="#$1">>>$1(OP)</a>`)
+      }
+      else if(browser_cookie === replySession){
+        returnedText = returnedText.replace(specificEx, '<a onmouseover="hoverpreview(this)" onmouseleave="hoverleave(this)" onclick="jump(this)" href="#$1">>>$1(Ti)</a>')
+      }
+      else{
+        returnedText = returnedText.replace(specificEx, '<a onmouseover="hoverpreview(this)" onmouseleave="hoverleave(this)" onclick="jump(this)" href="#$1">>>$1</a>')
+      }
+    }
+    return returnedText;
+  }
+  %>
 
-      let finishedMap = new Map(JSON.parse('<%- JSON.stringify(Array.from(mapForTags.entries())) %>'));
-
+  <script>
+    let finishedMap = new Map(JSON.parse('<%- JSON.stringify(Array.from(mapForTags.entries())) %>'));
       finishedMap.forEach(function (value, key){
-        document.getElementById('tags' + key).innerHTML = value.map(element => `<a href="/<%=board%>/thread/${key}#${element}" onmouseover="hoverpreview(this)" onmouseleave="hoverleave(this)">>>${element}</a>`).join(' ');
+        document.getElementById('tags' + key).innerHTML = value.map(element => `<a href="/<%=board%>/thread/${key}#${element}" onmouseover="hoverpreview(this)" onmouseleave="hoverleave(this)"> >>${element}</a>`).join('');
       })
-
       let colored = false;
       function hoverpreview(anchor){
         let targetID = parseInt(anchor.innerHTML.match(/\d+/)[0]);
         let targetDiv = document.getElementById(targetID);
-
         let isHidden = targetDiv.dataset.hidden;
-
         let bounding = targetDiv.getBoundingClientRect();
-
-
-
         if (
           bounding.top >= 0 &&
           bounding.left >= 0 &&
@@ -387,12 +314,10 @@
           bounding.right <= (window.innerWidth || document.documentElement.clientWidth)
                 && isHidden != "true"
         ) {
-          // If the element is in the viewport, change its background color to red
           targetDiv.style.backgroundColor = "#892523";
           colored = true;
         } else {
           colored = false;
-
           let previewDiv = targetDiv.cloneNode(true);
           previewDiv.style.left =  anchor.offsetLeft + 50 + "px";
           if(window.innerHeight < anchor.offsetTop - scrollY + targetDiv.clientHeight){
@@ -403,19 +328,13 @@
           }
           previewDiv.style.position = "absolute";
           previewDiv.style.backgroundColor = "#3C3C3C"
-
           previewDiv.removeAttribute('id');
           document.body.appendChild(previewDiv);
-
-          // Remove preview div when mouse leaves
           anchor.addEventListener('mouseleave', function() {
-            console.log('tu smo');
-            console.log(previewDiv.parentNode)
-            previewDiv.parentNode.removeChild(previewDiv);
+          previewDiv.parentNode.removeChild(previewDiv);
           });
         }
       }
-
 
       function hoverleave(anchor){
         let targetID = parseInt(anchor.innerHTML.match(/\d+/)[0]);
@@ -430,8 +349,6 @@
         }
       }
     </script>
-
-    <!--<script src="/javascripts/reply_form.js"></script>-->
     <script src="/javascripts/enlargeImage.js"></script>
     <script src="/javascripts/delete.js"></script>
     <script src="/javascripts/options.js"></script>

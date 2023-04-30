@@ -1,6 +1,7 @@
+/*Frontend provjera formi.*/
+
 const textArea = document.getElementById('text');
 const errorSpan = document.createElement('span');
-
 textArea.addEventListener('input', () => {
     const textAreaValue = textArea.value;
     if (textArea.value.length > 1999) {

@@ -1,3 +1,4 @@
+/*Postavlja konekciju i varijablu za bazu podataka.*/
 const { Pool } = require('pg');
 
 const pool = new Pool({

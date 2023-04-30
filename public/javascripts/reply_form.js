@@ -1,6 +1,4 @@
-// Hide the reply form initiall
-// Handle the click event on the "Post a reply" link
-
+/*Javascript za lebdeću formu.*/
 document.getElementById("reply_link").addEventListener("click", function(e) {
     e.preventDefault(); // Prevent the default link behavior
 
@@ -24,10 +22,7 @@ const drag = (position) => {
     let styles = floatingForm.getBoundingClientRect();
     let left = styles.left;
     let top = styles.top;
-
-    if(top < 0)
-        top = 0;
-
+    if(top < 0) top = 0;
     floatingForm.style.setProperty('left', `${left + position.movementX}px`)
     floatingForm.style.setProperty('top', `${top + position.movementY}px`)
 };
@@ -71,13 +66,10 @@ function formPopUp(id){
         let rect = id.getBoundingClientRect();
         floatingForm.style.left = rect.left + 50 + "px";
         floatingForm.style.top = rect.top + "px";
-
         const cursorPosition = floatingText.selectionStart;
         const currentValue = floatingText.value;
         const newValue = currentValue.slice(0, cursorPosition) + '>>' + id.getAttribute('data-id') + '\n' + currentValue.slice(cursorPosition);
         floatingText.value = newValue;
         floatingText.selectionStart = floatingText.selectionEnd = cursorPosition + ('>>' + id.getAttribute('data-id') + '\n').length;
-
-        //floatingText.value = floatingText.value + '>>' + id.getAttribute('data-id') + '\n';
     }
 }
