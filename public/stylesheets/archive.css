@@ -1,0 +1,36 @@
+@import "common.css";
+
+#arc-list{
+    border: 2px solid crimson;
+    max-width: 80%;
+    margin: 10px auto 0;
+}
+#arc-list td{
+    text-align: center;
+}
+table{
+    display: table;
+    border-collapse: separate;
+    box-sizing: border-box;
+    border-spacing: 1px;
+    text-indent: initial;
+}
+thead{
+    display: table-header-group;
+    vertical-align: middle;
+}
+thead td{
+    padding: 10px;
+    background-color: #1618a9;
+    border: 1px solid white;
+    font-weight: bolder;
+}
+
+#arc-list tbody tr:nth-child(even) {
+    background-color: #3C3C3C;
+}
+
+.rowd{
+    width: 90%;
+    text-align: left !important;
+}

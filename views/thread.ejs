@@ -9,7 +9,7 @@
   <body>
   <%let repliesNumber = replies.length;%>
 
-    <div class="navbar"><span class="boardList"> / <a href="/b" class="navbar_anchor">b</a> / <a href="/lit" class="navbar_anchor">lit</a> / <a href="/his" class="navbar_anchor">his</a> / <a href="/mu" class="navbar_anchor">mu</a> / <a href="/pol" class="navbar_anchor">pol</a> / </span> <span class="navbarRight">[<a id="delete1" class="navbar_anchor">Delete</a>] [<a class="navbar_anchor optionsLink">Options</a>]</span> </div>
+    <div class="navbar"><span class="boardList"> / <a href="/b" class="navbar_anchor">b</a> / <a href="/lit" class="navbar_anchor">lit</a> / <a href="/his" class="navbar_anchor">his</a> / <a href="/mu" class="navbar_anchor">mu</a> / <a href="/pol" class="navbar_anchor">pol</a> / </span> <span class="navbarRight">[<a id="delete1" class="navbar_anchor">Obriši</a>] [<a class="navbar_anchor optionsLink">Opcije</a>]</span> </div>
 
     <div class="boardBanner">
       <img alt="Jugochan" src="/images/<%=board%>_banner.jpg" class="boardBannerImage">
@@ -83,9 +83,9 @@
     <div id="navLinksTop">
       [<a href="/<%=board%>">Nazad</a>]
       [<a href="/<%=board%>/katalog">Katalog</a>]
-      [<a href="#navLinksBottom">Bottom</a>]
+      [<a href="#navLinksBottom">Dno</a>]
       <%if(thread.archived !== true){%>
-      [<a href="/<%=board%>/thread/<%=thread.id%>">Update</a>]
+      [<a href="/<%=board%>/thread/<%=thread.id%>">Osvježi</a>]
       <%}%>
     </div>
 
@@ -99,6 +99,7 @@
             <img alt onclick="toggleImageSize(this)" class="imageBeforeClick threadImage" src="/images/<%=thread.image_link%>">
           </a>
         </div>
+
           <input type="checkbox" id="ch<%=thread.id%>" value="t-<%=thread.id%>">
         <span id="thread_subject"><%=thread.thread_topic %> </span>
         <span class="post_username"><b><%=thread.username%></b> <%if(thread.tripcode != null){%><%='!' + thread.tripcode%><%}%></span>
@@ -161,9 +162,9 @@
     <div id="navLinksBottom">
       [<a href="/<%=board%>">Nazad</a>]
       [<a href="/<%=board%>/katalog">Katalog</a>]
-      [<a href="#navLinksTop">Top</a>]
+      [<a href="#navLinksTop">Vrh</a>]
       <%if(thread.archived !== true){%>
-      [<a href="/<%=board%>/thread/<%=thread.id%>">Update</a>]
+      [<a id="delete2">Obriši</a>]
       <%}%>
     </div>
 
@@ -195,7 +196,7 @@
     </div>
     <%}%>
 
-    <div class="navbar"><span class="boardList"> / <a href="/b" class="navbar_anchor">b</a> / <a href="/lit" class="navbar_anchor">lit</a> / <a href="/his" class="navbar_anchor">his</a> / <a href="/mu" class="navbar_anchor">mu</a> / <a href="/pol" class="navbar_anchor">pol</a> / </span> <span class="navbarRight">[<a id="delete2" class="navbar_anchor">Delete</a>] [<a class="navbar_anchor optionsLink">Options</a>]</span> </div>
+    <div class="navbar"><span class="boardList"> / <a href="/b" class="navbar_anchor">b</a> / <a href="/lit" class="navbar_anchor">lit</a> / <a href="/his" class="navbar_anchor">his</a> / <a href="/mu" class="navbar_anchor">mu</a> / <a href="/pol" class="navbar_anchor">pol</a> / </span> <span class="navbarRight">[<a id="delete2" class="navbar_anchor">Obriši</a>] [<a class="navbar_anchor optionsLink">Opcije</a>]</span> </div>
 
   <%
   function quoteText(text) {

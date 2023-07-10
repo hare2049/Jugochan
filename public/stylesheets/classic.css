@@ -1,0 +1,104 @@
+@import "common.css";
+
+
+.thread_replies_minus_five{
+    display: none;
+}
+
+#postLinkSpan{
+    font-size: 22px;
+    font-weight: 700;
+    text-align: center;
+}
+
+#post_form{
+    display: none;
+}
+
+#threads{
+    border-top: 1px groove #1618a9;
+    border-bottom: 1px groove #1618a9;
+}
+
+
+
+.imageBeforeClick{
+    background-size: contain;
+    max-height: 125px;
+    max-width: 125px;
+    margin-left: 10px;
+    margin-right: 10px;
+    float: left;
+}
+
+.opThread{
+    display: inline;
+    margin: 4px;
+}
+
+.post_username{
+    margin-left: 5px;
+    margin-right: 5px;
+    color: #dfd343;
+}
+.post_time{
+    margin-right: 5px;
+}
+.postMessage{
+    display: block;
+    white-space: pre-wrap;
+}
+.post_div{
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+.reply_div{
+    width: fit-content;
+    max-width: 80%;
+    background-color: #3C3C3C;
+    margin: 5px;
+    padding: 5px;
+    border-radius: 5px;
+    display: table;
+}
+.spanForOmitting{
+    color: gray;
+}
+
+.thread_subject{
+    color: #f30400;
+    font-weight: bolder;
+    font-size: larger;
+}
+
+.post_id{
+    color: #dadada;
+    text-decoration: none;
+}
+.post_id:hover{
+    color: #f30400;
+}
+.threadImage{
+    max-height: 250px;
+    max-width: 250px;
+}
+
+#pagelist{
+    margin-left: 10px;
+}
+
+.thread{
+    display: flex;
+    flex-direction: column;
+    border-bottom: 1px groove #1618a9;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.quote {
+    color: #a7d235;
+}
+
+.allTags a {
+    text-decoration: none;
+}

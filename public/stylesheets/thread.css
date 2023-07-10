@@ -1,5 +1,16 @@
 @import "common.css";
 
+
+.imageBeforeClick{
+  background-size: contain;
+  max-height: 125px;
+  max-width: 125px;
+  margin-left: 10px;
+  margin-right: 10px;
+  float: left;
+}
+
+
 #reply_form{
   display: none;
 }
@@ -50,15 +61,6 @@
 
 #replyLinkSpan{
   text-align: center;
-}
-
-.imageBeforeClick{
-  background-size: contain;
-  max-height: 125px;
-  max-width: 125px;
-  margin-left: 10px;
-  margin-right: 10px;
-  float: left;
 }
 
 .opThread{
@@ -126,4 +128,18 @@
 }
 .quote {
   color: #a7d235;
+}
+
+
+@media only screen and (max-width: 480px){
+  .imageBeforeClick{
+    max-width: 100px;
+    max-height: 100px;
+    object-fit: scale-down;
+  }
+  .opThread{
+    padding: 5px;
+    display: block;
+    overflow: hidden;
+  }
 }

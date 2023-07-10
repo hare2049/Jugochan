@@ -1,0 +1,130 @@
+body{
+    font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+    background-image: linear-gradient(#222222, #333333);
+    color: #dadada;
+    margin: 0;
+    min-height: 100vh;
+    position: relative;
+}
+
+a {
+    color: #00B7FF;
+    cursor: pointer;
+}
+
+#Overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* semi-transparent black */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.optionsLink{
+    cursor: pointer;
+}
+
+/* CSS for the form inside the overlay div */
+#Optionsform {
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+}
+
+.boardBanner{
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.boardBannerImage{
+    border: 1px solid white;
+    width: 300px;
+    height: 100px;
+}
+
+
+.boardTitle{
+    font-family: Tahoma,sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -2px;
+    margin-top: 0;
+    color: #f30400;
+}
+
+#navLinksTop{
+    margin-top: 20px;
+}
+#navLinksTop a{
+    text-decoration: none;
+}
+
+#navLinksBottom a{
+    text-decoration: none;
+}
+
+#bottom{
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.navbar{
+    display: flex;
+}
+
+.navbar a{
+    text-decoration: none;
+}
+
+.boardList{
+    display: flex;
+    width: 80%;
+    justify-content: center;
+}
+.navbarRight{
+    display: flex;
+    width: 20%;
+    justify-content: center;
+}
+.navbar_anchor{
+    cursor: pointer;
+    margin-right: 2%;
+    margin-left: 2%;
+}
+
+#togglePostFormLink{
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.labels{
+    font-weight: 700;
+    width: 100px;
+    border: 1px solid white;
+    background-color: #1618a9;
+    padding: 0 5px;
+    font-size: 10pt;
+}
+
+#username{
+    width: 244px;
+}
+#topic{
+    width: 244px;
+}
+
+.bottomNavbar{
+    position: absolute;
+    width: 100%;
+    bottom: 0;
+}

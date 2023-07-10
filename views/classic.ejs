@@ -7,9 +7,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
   </head>
   <body>
-  <%const mapForTags = new Map();%>
+  <%
+  const mapForTags = new Map();
+  const mapForThreads = new Map();
+  %>
 
-  <div class="navbar"><span class="boardList"> / <a href="/b" class="navbar_anchor">b</a> / <a href="/lit" class="navbar_anchor">lit</a> / <a href="/his" class="navbar_anchor">his</a> / <a href="/mu" class="navbar_anchor">mu</a> / <a href="/pol" class="navbar_anchor">pol</a> / </span> <span class="navbarRight">[<a id="delete1" class="navbar_anchor">Delete</a>] [<a class="navbar_anchor optionsLink">Options</a>]</span> </div>
+  <div class="navbar"><span class="boardList"> / <a href="/b" class="navbar_anchor">b</a> / <a href="/lit" class="navbar_anchor">lit</a> / <a href="/his" class="navbar_anchor">his</a> / <a href="/mu" class="navbar_anchor">mu</a> / <a href="/pol" class="navbar_anchor">pol</a> / </span> <span class="navbarRight">[<a id="delete1" class="navbar_anchor">Obriši</a>] [<a class="navbar_anchor optionsLink">Opcije</a>]</span> </div>
     <div class="boardBanner">
       <img alt="Jugochan" src="/images/<%=board%>_banner.jpg" class="boardBannerImage">
       <div class="boardTitle">
@@ -82,8 +85,7 @@
     <div id="navLinksTop">
       [<a href="/<%=board%>/katalog">Katalog</a>]
       [<a href="/<%=board%>/arhiva">Arhiva</a>]
-      [<a href="#navLinksBottom">Bottom</a>]
-      [<a href="/<%=board%>">Update</a>]
+      [<a href="#navLinksBottom">Dno</a>]
     </div>
 
     <div id="threads">
@@ -152,6 +154,7 @@
             }
           %>
           <%for (let j = 0; j < matchingReplies.length-num_of_last_replies; j++) {%>
+          <%mapForThreads.set(matchingReplies[j].id, threads[i].id)%>
             <div id="<%= matchingReplies[j].id %>" class="thread_reply post_div reply_div" data-hidden="true">
               <%if(matchingReplies[j].image_link != null){%>
               <div class="file">
@@ -191,6 +194,7 @@
 
         <div class="last_five">
           <%for (let j = matchingReplies.length-num_of_last_replies; j < matchingReplies.length; j++) {%>
+          <%mapForThreads.set(matchingReplies[j].id, threads[i].id)%>
           <div id="<%= matchingReplies[j].id %>" class="thread_reply post_div reply_div">
             <%if(matchingReplies[j].image_link != null){%>
             <div class="file">
@@ -234,8 +238,7 @@
     <div id="navLinksBottom">
       [<a href="/<%=board%>/katalog">Katalog</a>]
       [<a href="/<%=board%>/arhiva">Arhiva</a>]
-      [<a href="#navLinksTop">Top</a>]
-      [<a href="/<%=board%>">Update</a>]
+      [<a href="#navLinksTop">Vrh</a>]
     </div>
 
     <div id="pagelist">
@@ -256,7 +259,7 @@
       <%}%>
     </div>
 
-    <div class="navbar"><span class="boardList"> / <a href="/b" class="navbar_anchor">b</a> / <a href="/lit" class="navbar_anchor">lit</a> / <a href="/his" class="navbar_anchor">his</a> / <a href="/mu" class="navbar_anchor">mu</a> / <a href="/pol" class="navbar_anchor">pol</a> / </span> <span class="navbarRight">[<a id="delete2" class="navbar_anchor">Delete</a>] [<a class="navbar_anchor optionsLink">Options</a>]</span> </div>
+    <div class="navbar"><span class="boardList"> / <a href="/b" class="navbar_anchor">b</a> / <a href="/lit" class="navbar_anchor">lit</a> / <a href="/his" class="navbar_anchor">his</a> / <a href="/mu" class="navbar_anchor">mu</a> / <a href="/pol" class="navbar_anchor">pol</a> / </span> <span class="navbarRight">[<a id="delete2" class="navbar_anchor">Obriši</a>] [<a class="navbar_anchor optionsLink">Opcije</a>]</span> </div>
 
   <%
   function quoteText(text, threadid, comingFromID) {
@@ -297,9 +300,10 @@
   %>
 
   <script>
-    let finishedMap = new Map(JSON.parse('<%- JSON.stringify(Array.from(mapForTags.entries())) %>'));
+      let finishedMap = new Map(JSON.parse('<%- JSON.stringify(Array.from(mapForTags.entries())) %>'));
+      let finishedThreadsMap = new Map(JSON.parse('<%- JSON.stringify(Array.from(mapForThreads.entries())) %>'));
       finishedMap.forEach(function (value, key){
-        document.getElementById('tags' + key).innerHTML = value.map(element => `<a href="/<%=board%>/thread/${key}#${element}" onmouseover="hoverpreview(this)" onmouseleave="hoverleave(this)"> >>${element}</a>`).join('');
+        document.getElementById('tags' + key).innerHTML = value.map(element => `<a href="/<%=board%>/thread/${finishedThreadsMap.get(element)}#${element}" onmouseover="hoverpreview(this)" onmouseleave="hoverleave(this)"> >>${element}</a>`).join('');
       })
       let colored = false;
       function hoverpreview(anchor){

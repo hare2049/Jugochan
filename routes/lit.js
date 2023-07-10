@@ -14,7 +14,6 @@ const storage = multer.diskStorage({
   }
 });
 
-// Set up Multer configuration
 const upload = multer({
   storage: storage,
   limits: { fileSize: 8000000 },
@@ -28,7 +27,6 @@ const upload = multer({
   }
 });
 
-//ovde sam STAO!!
 router.get('/', function(req, res, next) {
   pool.connect(async (err,client,done) => {
     if(err)

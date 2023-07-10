@@ -1,0 +1,79 @@
+@import "common.css";
+
+.landing{
+    display: flex;
+    justify-content: center;
+}
+.description{
+    display: flex;
+    flex-direction: column;
+    border: 1px groove #f30400;
+    border-radius: 5px;
+    width: 50%;
+    text-align: center;
+    font-size: large;
+}
+.description h1{
+    color: #f30400;
+    border-bottom: 1px groove #1618a9;
+}
+.boards{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+
+    padding: 10px;
+}
+.boards a{
+    text-decoration: none;
+}
+.newThreads{
+    margin-top: 30px;
+}
+#threads{
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    /*mozda bolje align-content*/
+    align-content: center;
+    /*mozda bolje justify-content*/
+    justify-content: center;
+
+    text-align: center;
+}
+
+.thread{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    word-wrap: break-word;
+    overflow: hidden;
+    margin-top: 5px;
+    margin-bottom: 20px;
+    padding: 5px 0 3px;
+
+    width: 180px;
+    /*mozda dodati max ovde*/
+    height: 328px;
+}
+.thumbnail{
+    background-size: contain;
+    max-width: 160px;
+    max-height: 180px;
+    border: 1px solid #ccc;
+    box-shadow: 0 0 5px rgba(0,0,0,.25);
+    min-height: 50px;
+    min-width: 50px;
+    cursor: pointer;
+}
+
+.teaser{
+    display: block;
+    width: 165px;
+    height: 180px;
+    padding: 0 15px;
+}
+.thread a{
+    text-decoration: none;
+}
