@@ -79,7 +79,7 @@ router.get('/arhiva', function(req, res, next) {
   pool.connect(async (err, client, done) => {
     if(err)
       return res.send(err)
-    client.query(`SELECT * FROM post WHERE board = $1 ORDER BY most_recent_reply DESC OFFSET 200`, [board], async(err, result) => {
+    client.query(`SELECT * FROM post WHERE board = $1 AND archived = true ORDER BY most_recent_reply DESC`, [board], async(err, result) => {
       done()
       if(err) res.send(err);
       console.log(result);
@@ -142,11 +142,17 @@ router.post('/post', upload.single('uploaded_file'), function(req, res, next){
     return res.status(400).send('Morate priložiti fajl');
   }
 
+  let username = req.body.username;
+  if(username === ''){
+    username = 'Anoniman';
+  }
+
   var tripcode;
   if(req.body.username.includes('#')){
     split = req.body.username.split('#');
     username = split[0];
     tripcode = split[1];
+
 
     bcrypt.hash(tripcode, 10, function (err, hash){
       pool.connect(async (err,client,done) => {
@@ -172,7 +178,7 @@ router.post('/post', upload.single('uploaded_file'), function(req, res, next){
       client.query(`SELECT last_value FROM thread_number`, [], async(err, result) => {
         if(err)
           return res.send(err);
-        client.query(`INSERT INTO post(thread_topic, username, text, image_link, board) VALUES($1,$2,$3,$4,$5);`, [req.body.topic, req.body.username, req.body.text, req.file.filename, board], async(err) => {
+        client.query(`INSERT INTO post(thread_topic, username, text, image_link, board) VALUES($1,$2,$3,$4,$5);`, [req.body.topic, username, req.body.text, req.file.filename, board], async(err) => {
           done()
           if(err)
             return res.send(err);
@@ -205,7 +211,6 @@ router.post('/reply', upload.single('uploaded_file'), function(req, res, next){
       split = req.body.username.split('#');
       username = split[0];
       tripcode = split[1];
-      console.log(tripcode);
 
       bcrypt.hash(tripcode, 10, function (err, hash){
         pool.connect(async (err,client,done) => {

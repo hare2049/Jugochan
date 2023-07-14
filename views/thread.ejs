@@ -200,6 +200,9 @@
 
   <%
   function quoteText(text) {
+    if(text == null){
+      return text;
+    }
     const regexQ = /(^|[^>])>(?!>)((?:.(?!>>))+)/g;
     let returnedText = text.replace(regexQ, '$1<span class="quote">>$2</span>');
 

@@ -264,8 +264,11 @@
   <%
   function quoteText(text, threadid, comingFromID) {
     const regexQ = /(^|[^>])>(?!>)((?:.(?!>>))+)/g;
-    let returnedText = text.replace(regexQ, '$1<span class="quote">>$2</span>');
     let regex = />>(\d+)/g;
+    if(text == null){
+      return text;
+    }
+    let returnedText = text.replace(regexQ, '$1<span class="quote">>$2</span>');
     let matches = returnedText.match(regex)
     if (matches === null) return returnedText;
     let tags = matches.map(match => match.replace(/>>/g, ''));

@@ -27,6 +27,7 @@
         <span>Aktivni ili novi threadovi:</span>
         <div id="threads">
           <%for(let i = 0; i < threads.length; i++){%>
+          <%console.log('aaaaaa')%>
             <div class="thread">
               <a class="onBoard" href="/<%=threads[i].board%>">/<%=threads[i].board%>/</a>
               <a href="/<%=threads[i].board%>/thread/<%=threads[i].id%>"><img alt class="thumbnail" src="/images/<%=threads[i].image_link%>"></a>

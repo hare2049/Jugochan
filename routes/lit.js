@@ -79,7 +79,7 @@ router.get('/arhiva', function(req, res, next) {
   pool.connect(async (err, client, done) => {
     if(err)
       return res.send(err)
-    client.query(`SELECT * FROM post WHERE board = $1 ORDER BY most_recent_reply DESC OFFSET 200`, [board], async(err, result) => {
+    client.query(`SELECT * FROM post WHERE board = $1 AND archived = true ORDER BY most_recent_reply DESC`, [board], async(err, result) => {
       done()
       if(err) res.send(err);
       console.log(result);
@@ -140,6 +140,11 @@ router.post('/post', upload.single('uploaded_file'), function(req, res, next){
 
   if (!req.file) {
     return res.status(400).send('Morate priložiti fajl');
+  }
+
+  let username = req.body.username;
+  if(username === ''){
+    username = 'Anoniman';
   }
 
   var tripcode;
